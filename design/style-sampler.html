@@ -1,0 +1,177 @@
+<title>MoveMent Style Sampler</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=Nunito:wght@400;700;900&family=Barlow+Condensed:wght@500;700;800&family=Barlow:wght@400;600&family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;600&family=IBM+Plex+Mono:wght@400;600&family=Fraunces:opsz,wght@9..144,400;9..144,800&family=Source+Serif+4:wght@400;600&family=Caveat:wght@600;700&family=Plus+Jakarta+Sans:wght@400;600;800&family=Chakra+Petch:wght@500;700&family=Work+Sans:wght@400;600&display=swap">
+<style>
+/* Layout: page chrome is a quiet neutral frame; each theme card is a self-contained world showing the same mini tracker screen. */
+:root {
+  --bg: #f3f3f1; --fg: #1d1e20; --muted: #686a6f; --line: #d9d9d4; --chip: #ffffff; --pick: #1d1e20; --pick-fg: #fff;
+  --ui: "DM Sans", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #161719; --fg: #ececea; --muted: #9a9ca1; --line: #2e3034; --chip: #202226; --pick: #ececea; --pick-fg: #161719; color-scheme: dark } }
+:root[data-theme="dark"] { --bg: #161719; --fg: #ececea; --muted: #9a9ca1; --line: #2e3034; --chip: #202226; --pick: #ececea; --pick-fg: #161719; color-scheme: dark }
+body { background: var(--bg); color: var(--fg); font-family: var(--ui); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-block: 32px 120px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+header.intro { max-width: 68ch; display: grid; gap: 8px; margin-bottom: 28px; }
+header.intro h1 { font-size: 28px; line-height: 1.15; margin: 0; text-wrap: balance; font-weight: 600; }
+header.intro p { margin: 0; color: var(--muted); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr)); gap: 28px; }
+.entry { display: grid; gap: 10px; min-width: 0; }
+.meta { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.meta h2 { font-size: 17px; margin: 0; font-weight: 600; }
+.meta .tags { color: var(--muted); font-size: 13px; }
+.vote { display: flex; gap: 6px; }
+.vote button { flex: 1; font: inherit; font-size: 13px; padding: 6px 8px; border: 1px solid var(--line); background: var(--chip); color: var(--fg); border-radius: 6px; cursor: pointer; }
+.vote button[aria-pressed="true"] { background: var(--pick); color: var(--pick-fg); border-color: var(--pick); }
+.vote button:focus-visible, .tray button:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+.note { width: 100%; box-sizing: border-box; font: inherit; font-size: 13px; padding: 6px 8px; border: 1px solid var(--line); background: var(--chip); color: var(--fg); border-radius: 6px; }
+
+.tray { position: fixed; left: 0; right: 0; bottom: 0; background: var(--chip); border-top: 1px solid var(--line); padding-block: 12px calc(12px + env(safe-area-inset-bottom, 0px)); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; z-index: 5; }
+.tray span { color: var(--muted); font-size: 13px; min-width: 0; }
+.tray button { font: inherit; font-weight: 600; padding: 8px 14px; border-radius: 6px; border: 0; background: var(--pick); color: var(--pick-fg); cursor: pointer; }
+textarea#out { width: 100%; min-height: 120px; box-sizing: border-box; font: 12px/1.5 "IBM Plex Mono", monospace; margin-top: 8px; background: var(--chip); color: var(--fg); border: 1px solid var(--line); border-radius: 6px; padding: 8px; }
+
+/* ---- The sample screen: one markup, many themes ---- */
+.screen { --r: 12px; --bw: 1px; --shadow: none; border-radius: var(--r); overflow: hidden; background: var(--s-bg); color: var(--s-fg); font-family: var(--s-body); padding: 20px; display: grid; gap: 16px; border: var(--bw) solid var(--s-line); box-shadow: var(--shadow); min-height: 440px; box-sizing: border-box; }
+.screen .top { display: flex; justify-content: space-between; align-items: baseline; }
+.screen .day { font-family: var(--s-head); font-size: 20px; font-weight: var(--s-hw, 700); letter-spacing: var(--s-ls, 0); text-transform: var(--s-tt, none); }
+.screen .date { font-size: 12px; color: var(--s-muted); }
+.screen .panel { background: var(--s-card); border: var(--bw) solid var(--s-line); border-radius: calc(var(--r) * .75); padding: 14px; display: grid; gap: 10px; box-shadow: var(--s-cardshadow, none); backdrop-filter: var(--s-blur, none); }
+.screen .kcal { display: flex; align-items: baseline; gap: 8px; }
+.screen .big { font-family: var(--s-num, var(--s-head)); font-size: 40px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; color: var(--s-accent-text, var(--s-fg)); }
+.screen .lbl { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--s-muted); }
+.screen .macro { display: grid; grid-template-columns: 22px 1fr 64px; align-items: center; gap: 8px; font-size: 12px; font-variant-numeric: tabular-nums; }
+.screen .bar { height: var(--s-barh, 8px); background: var(--s-track); border-radius: var(--s-barr, 99px); overflow: hidden; border: var(--s-barb, 0) solid var(--s-line); }
+.screen .bar i { display: block; height: 100%; border-radius: inherit; }
+.screen .p i { background: var(--s-p); } .screen .c i { background: var(--s-c); } .screen .f i { background: var(--s-f); }
+.screen .macro b { text-align: right; font-weight: 600; }
+.screen .lift { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; font-size: 13px; padding-block: 6px; border-top: 1px solid var(--s-line); }
+.screen .lift:first-of-type { border-top: 0; }
+.screen .lift small { color: var(--s-muted); font-size: 12px; grid-column: 1; }
+.screen .lift em { font-style: normal; font-variant-numeric: tabular-nums; font-family: var(--s-num, inherit); grid-row: 1 / span 2; grid-column: 2; align-self: center; }
+.screen .actions { display: flex; gap: 8px; }
+.screen .btn { flex: 1; text-align: center; padding: 10px; font-weight: 700; font-size: 13px; border-radius: var(--s-btnr, 8px); background: var(--s-accent); color: var(--s-on-accent); border: var(--bw) solid var(--s-btnline, transparent); box-shadow: var(--s-btnshadow, none); font-family: var(--s-head); letter-spacing: var(--s-ls, 0); text-transform: var(--s-tt, none); }
+.screen .btn.ghost { background: transparent; color: var(--s-fg); border: var(--bw) solid var(--s-line); }
+
+/* 1 Swiss Utility */
+.t-swiss { --s-bg:#fff; --s-fg:#111; --s-muted:#6b6b6b; --s-line:#111; --s-card:#fff; --s-track:#e9e9e9; --s-accent:#e30613; --s-on-accent:#fff; --s-p:#111; --s-c:#e30613; --s-f:#9a9a9a;
+  --s-head:"Archivo",sans-serif; --s-body:"Archivo",sans-serif; --r:0px; --s-barr:0; --s-btnr:0; --s-hw:800; --s-ls:-.01em; }
+/* 2 Soft Pastel */
+.t-pastel { --s-bg:#fdf6f0; --s-fg:#3b3355; --s-muted:#8c84a3; --s-line:#efe3da; --s-card:#fff; --s-track:#f3ece6; --s-accent:#7c6cf0; --s-on-accent:#fff; --s-p:#ff9b85; --s-c:#7fd1ae; --s-f:#ffd36e;
+  --s-head:"Nunito",sans-serif; --s-body:"Nunito",sans-serif; --r:26px; --s-btnr:99px; --s-hw:900; --bw:0px; --s-cardshadow:0 6px 18px rgba(124,108,240,.08); --s-barh:10px; }
+/* 3 Dark Athletic */
+.t-athletic { --s-bg:#141518; --s-fg:#f2f2f2; --s-muted:#8b8e96; --s-line:#2a2c31; --s-card:#1c1e22; --s-track:#2a2c31; --s-accent:#ff5a1f; --s-on-accent:#141518; --s-p:#ff5a1f; --s-c:#f2f2f2; --s-f:#6c7080; --s-accent-text:#ff5a1f;
+  --s-head:"Barlow Condensed",sans-serif; --s-body:"Barlow",sans-serif; --r:6px; --s-btnr:4px; --s-hw:800; --s-tt:uppercase; --s-ls:.02em; --s-barr:2px; --s-barh:6px; }
+/* 4 Brutalist */
+.t-brutal { --s-bg:#fff7d6; --s-fg:#000; --s-muted:#4a4a4a; --s-line:#000; --s-card:#fff; --s-track:#fff; --s-accent:#ffd400; --s-on-accent:#000; --s-p:#ff4d8d; --s-c:#3d7cff; --s-f:#000;
+  --s-head:"Space Mono",monospace; --s-body:"Space Mono",monospace; --r:0px; --bw:2px; --s-cardshadow:4px 4px 0 #000; --s-btnshadow:3px 3px 0 #000; --s-btnline:#000; --s-btnr:0; --s-barr:0; --s-barb:2px; --s-barh:12px; --s-tt:uppercase; }
+/* 5 Nordic Calm */
+.t-nordic { --s-bg:#eef0ec; --s-fg:#2f3a35; --s-muted:#7a857f; --s-line:#d9ddd6; --s-card:#f7f8f5; --s-track:#e1e5de; --s-accent:#4f6b5d; --s-on-accent:#f7f8f5; --s-p:#4f6b5d; --s-c:#a7b8a3; --s-f:#c9b79c;
+  --s-head:"DM Sans",sans-serif; --s-body:"DM Sans",sans-serif; --r:14px; --s-hw:300; --s-barh:4px; --s-btnr:10px; }
+/* 6 Terminal */
+.t-term { --s-bg:#0b0f0b; --s-fg:#b6f5a8; --s-muted:#5e8a56; --s-line:#1f3a1c; --s-card:#0b0f0b; --s-track:#132313; --s-accent:#b6f5a8; --s-on-accent:#0b0f0b; --s-p:#b6f5a8; --s-c:#7fd06e; --s-f:#4a8a3f;
+  --s-head:"IBM Plex Mono",monospace; --s-body:"IBM Plex Mono",monospace; --r:2px; --s-barr:0; --s-btnr:0; --s-hw:600; --s-barh:8px; }
+/* 7 Glass */
+.t-glass { --s-bg:linear-gradient(150deg,#7dd3fc 0%,#a78bfa 55%,#f9a8d4 100%); --s-fg:#1b1736; --s-muted:#4b4570; --s-line:rgba(255,255,255,.55); --s-card:rgba(255,255,255,.42); --s-track:rgba(255,255,255,.5); --s-accent:#1b1736; --s-on-accent:#fff; --s-p:#1b1736; --s-c:#ffffff; --s-f:#6d5bd0;
+  --s-head:"Plus Jakarta Sans",sans-serif; --s-body:"Plus Jakarta Sans",sans-serif; --r:24px; --s-blur:blur(12px); --s-btnr:14px; --s-hw:800; --s-barh:10px; }
+/* 8 Editorial */
+.t-editorial { --s-bg:#fbfaf7; --s-fg:#1a1a1a; --s-muted:#757070; --s-line:#e2ded6; --s-card:#fbfaf7; --s-track:#ebe7df; --s-accent:#1a1a1a; --s-on-accent:#fbfaf7; --s-p:#1f3d7a; --s-c:#8a8a8a; --s-f:#c9a227;
+  --s-head:"Fraunces",serif; --s-body:"Source Serif 4",serif; --s-num:"Fraunces",serif; --r:2px; --s-btnr:2px; --s-hw:800; --s-barh:3px; --s-barr:0; }
+/* 9 Synthwave */
+.t-synth { --s-bg:#1a0b2e; --s-fg:#f4e9ff; --s-muted:#a48bc4; --s-line:#3d2363; --s-card:#24113f; --s-track:#3d2363; --s-accent:#ff2fb3; --s-on-accent:#1a0b2e; --s-p:#ff2fb3; --s-c:#22e4ff; --s-f:#ffd23f; --s-accent-text:#22e4ff;
+  --s-head:"Chakra Petch",sans-serif; --s-body:"Chakra Petch",sans-serif; --r:10px; --s-cardshadow:0 0 0 1px #3d2363, 0 0 24px rgba(255,47,179,.15); --s-btnr:6px; --s-tt:uppercase; --s-ls:.04em; }
+/* 10 Paper Notebook */
+.t-notebook { --s-bg:#fffdf6; --s-fg:#24324a; --s-muted:#7a8496; --s-line:#cfd8e6; --s-card:transparent; --s-track:#e8edf5; --s-accent:#2c5fd6; --s-on-accent:#fff; --s-p:#e2574c; --s-c:#2c5fd6; --s-f:#e9a23b;
+  --s-head:"Caveat",cursive; --s-body:"Work Sans",sans-serif; --s-num:"Caveat",cursive; --r:4px; --s-btnr:4px; --s-hw:700; }
+.t-notebook { background-image: linear-gradient(var(--s-line) 1px, transparent 1px), linear-gradient(90deg, var(--s-line) 1px, transparent 1px); background-size: 22px 22px; background-color: var(--s-bg); }
+.t-notebook .day { font-size: 30px; } .t-notebook .big { font-size: 52px; }
+.t-glass { background: var(--s-bg); }
+.t-editorial .day { font-size: 26px; font-style: italic; }
+.t-term .day::before { content: "> "; }
+.t-term .big { font-weight: 600; }
+</style>
+
+<div class="wrap">
+  <header class="intro">
+    <h1>Pick the looks you like</h1>
+    <p>Every card shows the same MoveMent screen: today's calories, macros, and a logged workout. Only the styling changes. Mark each one Love, Maybe, or No, and add a note about what caught your eye or bugged you (the font, the colors, how rounded it is, how busy it feels).</p>
+    <p>When you're done, press "Copy my picks" at the bottom and paste the result back into the chat.</p>
+  </header>
+  <div class="grid" id="grid"></div>
+  <textarea id="out" readonly hidden aria-label="Your picks"></textarea>
+</div>
+
+<div class="tray">
+  <span id="count">0 of 10 rated</span>
+  <button type="button" id="copy">Copy my picks</button>
+</div>
+
+<script>
+const themes = [
+  ["swiss","Swiss Utility","Stark white, black type, one red accent, square corners"],
+  ["pastel","Soft Pastel","Warm, rounded, friendly colors, no borders"],
+  ["athletic","Dark Athletic","Charcoal and orange, tall condensed sports type"],
+  ["brutal","Brutalist","Thick outlines, hard shadows, monospace, loud"],
+  ["nordic","Nordic Calm","Muted greens and stone, light type, lots of air"],
+  ["term","Terminal","Green-on-black monospace, like a command line"],
+  ["glass","Frosted Glass","Bright gradient behind see-through cards"],
+  ["editorial","Editorial","Serif type, off-white paper, magazine feel"],
+  ["synth","Synthwave","Deep purple with neon pink and cyan"],
+  ["notebook","Paper Notebook","Graph paper and handwritten headings"]
+];
+const screen = (k) => `
+<div class="screen t-${k}" aria-hidden="true">
+  <div class="top"><div class="day">Monday</div><div class="date">Nov 9</div></div>
+  <div class="panel">
+    <div class="lbl">Calories left</div>
+    <div class="kcal"><span class="big">642</span><span class="date">of 2,400 kcal</span></div>
+    <div class="macro p"><span>P</span><div class="bar"><i style="width:78%"></i></div><b>142/180g</b></div>
+    <div class="macro c"><span>C</span><div class="bar"><i style="width:64%"></i></div><b>166/260g</b></div>
+    <div class="macro f"><span>F</span><div class="bar"><i style="width:81%"></i></div><b>57/70g</b></div>
+  </div>
+  <div class="panel">
+    <div class="lbl">Push day</div>
+    <div class="lift"><span>Bench press</span><small>3 sets × 8</small><em>185 lb</em></div>
+    <div class="lift"><span>Overhead press</span><small>3 sets × 10</small><em>95 lb</em></div>
+    <div class="lift"><span>Incline DB press</span><small>3 sets × 12</small><em>55 lb</em></div>
+  </div>
+  <div class="actions"><span class="btn">Log food</span><span class="btn ghost">Add set</span></div>
+</div>`;
+const state = {};
+let saved = {}; try { saved = JSON.parse(localStorage.getItem("picks") || "{}"); } catch (e) {}
+const grid = document.getElementById("grid");
+themes.forEach(([k, name, tags]) => {
+  state[k] = saved[k] || { v: "", n: "" };
+  const el = document.createElement("section");
+  el.className = "entry";
+  el.innerHTML = `<div class="meta"><h2>${name}</h2><span class="tags">${tags}</span></div>${screen(k)}
+    <div class="vote" role="group" aria-label="Rate ${name}">${["Love","Maybe","No"].map(v=>`<button type="button" data-v="${v}" aria-pressed="${state[k].v===v}">${v}</button>`).join("")}</div>
+    <input class="note" id="note-${k}" placeholder="What did you like or dislike?" value="">`;
+  el.querySelector(".note").value = state[k].n;
+  el.querySelectorAll(".vote button").forEach(b => b.onclick = () => {
+    state[k].v = state[k].v === b.dataset.v ? "" : b.dataset.v;
+    el.querySelectorAll(".vote button").forEach(x => x.setAttribute("aria-pressed", x.dataset.v === state[k].v));
+    sync();
+  });
+  el.querySelector(".note").oninput = (e) => { state[k].n = e.target.value; sync(); };
+  grid.appendChild(el);
+});
+function summary() {
+  return "My style picks:\n" + themes.map(([k, name]) => {
+    const s = state[k]; return `- ${name}: ${s.v || "unrated"}${s.n ? " (" + s.n + ")" : ""}`;
+  }).join("\n");
+}
+function sync() {
+  document.getElementById("count").textContent = `${themes.filter(([k]) => state[k].v).length} of ${themes.length} rated`;
+  try { localStorage.setItem("picks", JSON.stringify(state)); } catch (e) {}
+}
+sync();
+document.getElementById("copy").onclick = () => {
+  const text = summary(), out = document.getElementById("out"), btn = document.getElementById("copy");
+  out.value = text; out.hidden = false;
+  const done = () => { btn.textContent = "Copied"; setTimeout(() => btn.textContent = "Copy my picks", 1500); };
+  try { navigator.clipboard.writeText(text).then(done, () => { out.select(); btn.textContent = "Select and copy the text above"; }); }
+  catch (e) { out.select(); }
+};
+</script>
