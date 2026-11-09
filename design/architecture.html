@@ -1,0 +1,273 @@
+<title>MoveMent Architecture</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Manrope:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: one reading column of diagram cards, styled with the personal UI tokens (single dark look). */
+:root {
+  --bg:#000; --surface:#0E0F11; --surface-2:#17181B; --line:#2A2C31; --line-strong:#3A3D44;
+  --fg:#F2F2F2; --muted:#8B8E96; --faint:#5A5D64; --accent:#FF5A1F; --accent-dim:rgba(255,90,31,.14);
+  --success:#3DDC84; --warning:#FFC233; --danger:#FF4D6A;
+  --l-app:#FF5A1F; --l-feat:#FFC9B3; --l-data:#3DDC84; --l-ui:#7FB2FF; --l-lib:#8B8E96;
+  --font-text:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-num:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  color-scheme: dark;
+}
+body { background:var(--bg); color:var(--fg); font:400 14px/1.55 var(--font-text); -webkit-font-smoothing:antialiased; }
+.page { max-width:880px; margin:0 auto; padding-block:32px 64px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); display:grid; gap:28px; }
+h1 { font-weight:800; font-size:28px; line-height:1.2; letter-spacing:-.01em; margin:0; text-wrap:balance; }
+h2 { font-weight:800; font-size:18px; margin:0; text-wrap:balance; }
+h3 { font-weight:700; font-size:14px; margin:0; }
+p { margin:0; max-width:68ch; }
+.muted { color:var(--muted); } .small { font-size:12px; }
+.num, code { font-family:var(--font-num); font-size:12.5px; }
+code { color:var(--fg); background:var(--surface); border:1px solid var(--line); border-radius:6px; padding:0 5px; }
+.label { font:600 11px/1.2 var(--font-text); text-transform:uppercase; letter-spacing:.08em; color:var(--muted); }
+.card { border:1px solid var(--line); border-radius:10px; padding:16px; display:grid; gap:14px; min-width:0; }
+.sec { display:grid; gap:12px; }
+.sec > header { display:grid; gap:4px; }
+.toc { display:flex; flex-wrap:wrap; gap:6px; }
+.toc a { height:28px; padding:0 12px; border-radius:999px; border:1px solid var(--line); color:var(--fg); text-decoration:none; font:600 12px var(--font-text); display:inline-flex; align-items:center; }
+.toc a:hover { border-color:var(--accent); color:var(--accent); }
+a:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+
+/* 1. Big picture */
+.zones { display:grid; grid-template-columns:1fr 44px 1.35fr; gap:0; align-items:stretch; }
+.zone { border:1px dashed var(--line-strong); border-radius:10px; padding:12px; display:grid; gap:8px; align-content:start; }
+.zone > .label { margin-bottom:2px; }
+.box { border:1px solid var(--line); border-radius:8px; padding:8px 10px; background:var(--bg); display:grid; gap:2px; }
+.box b { font-weight:700; font-size:13px; }
+.box span { font-size:12px; color:var(--muted); }
+.box.hot { border-color:var(--accent); }
+.box.db { border-radius:8px 8px 14px 14px; border-color:var(--l-data); }
+.vline { justify-self:center; width:1px; height:12px; background:var(--line-strong); }
+.hconn { display:grid; place-items:center; color:var(--muted); font:11px var(--font-num); text-align:center; }
+.hconn svg { width:44px; height:20px; }
+.externals { display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin-top:8px; }
+.ext { border:1px solid var(--line); border-radius:8px; padding:8px 10px; display:grid; gap:2px; position:relative; }
+.ext::before { content:""; position:absolute; left:50%; top:-9px; height:8px; border-left:1px dashed var(--line-strong); }
+.ext b { font-size:12.5px; } .ext span { font-size:11.5px; color:var(--muted); }
+@media (max-width:640px) {
+  .zones { grid-template-columns:1fr; }
+  .hconn svg { transform:rotate(90deg); }
+  .hconn { padding-block:4px; }
+  .externals { grid-template-columns:1fr; }
+}
+
+/* 2. Layers */
+.layers { display:grid; gap:0; }
+.layer { display:grid; grid-template-columns:120px 1fr auto; gap:12px; align-items:center; border:1px solid var(--line); border-left:4px solid var(--c); border-radius:10px; padding:10px 12px; }
+.layer .name { font:600 14px var(--font-num); color:var(--c); }
+.layer .what { font-size:13px; }
+.layer .what small { display:block; color:var(--muted); font-size:12px; }
+.layer .may { font:11px var(--font-num); color:var(--muted); text-align:right; }
+.down { display:flex; justify-content:center; height:20px; color:var(--faint); }
+.down svg { width:14px; height:20px; }
+.legend { display:flex; flex-wrap:wrap; gap:12px; font-size:12px; color:var(--muted); }
+.legend i { display:inline-block; width:10px; height:10px; border-radius:3px; background:var(--c); margin-right:6px; vertical-align:-1px; }
+@media (max-width:640px) { .layer { grid-template-columns:1fr; gap:4px; } .layer .may { text-align:left; } }
+
+/* 3. Tree */
+.tree { font:12.5px/1.75 var(--font-num); overflow-x:auto; white-space:pre; padding:12px; border:1px solid var(--line); border-radius:10px; background:var(--surface); }
+.tree .d { font-weight:600; }
+.tree .c { color:var(--faint); }
+.tree .app { color:var(--l-app); } .tree .feat { color:var(--l-feat); } .tree .data { color:var(--l-data); } .tree .ui { color:var(--l-ui); } .tree .lib { color:var(--l-lib); }
+
+/* 4. Feature anatomy */
+.anatomy { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; align-items:stretch; }
+.anatomy .box { padding:12px; gap:6px; }
+.anatomy .box .label { color:var(--c, var(--muted)); }
+.arrowrow { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; font:11px var(--font-num); color:var(--muted); text-align:center; }
+@media (max-width:640px) { .anatomy, .arrowrow { grid-template-columns:1fr; } .arrowrow { display:none; } }
+
+/* 5. Sequence */
+.seq { display:grid; gap:0; counter-reset:step; }
+.step { display:grid; grid-template-columns:28px 1fr; gap:12px; position:relative; padding-bottom:14px; }
+.step:last-child { padding-bottom:0; }
+.step::before { counter-increment:step; content:counter(step); width:28px; height:28px; border-radius:50%; border:1px solid var(--accent); color:var(--accent); display:grid; place-items:center; font:600 12px var(--font-num); background:var(--bg); z-index:1; }
+.step:not(:last-child)::after { content:""; position:absolute; left:14px; top:28px; bottom:0; border-left:1px solid var(--line-strong); }
+.step div { display:grid; gap:2px; padding-top:3px; min-width:0; }
+.step .who { font:11px var(--font-num); color:var(--muted); }
+
+/* 6. Data model */
+.tables { display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap:10px; }
+.tbl { border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+.tbl h3 { padding:8px 10px; border-bottom:1px solid var(--line); font:600 13px var(--font-num); display:flex; justify-content:space-between; gap:8px; }
+.tbl h3 span { color:var(--muted); font-weight:400; font-size:11px; }
+.tbl ul { list-style:none; margin:0; padding:6px 10px 8px; font:12px/1.7 var(--font-num); color:var(--muted); }
+.tbl li b { color:var(--fg); font-weight:400; }
+.tbl li .fk { color:var(--accent); }
+.rels { display:grid; gap:4px; font:12px var(--font-num); color:var(--muted); }
+.rels b { color:var(--fg); font-weight:400; }
+
+table.where { width:100%; border-collapse:collapse; font-size:13px; }
+.where th { text-align:left; font:600 11px var(--font-text); text-transform:uppercase; letter-spacing:.08em; color:var(--muted); padding:8px; border-bottom:1px solid var(--line); }
+.where td { padding:8px; border-top:1px solid var(--line); vertical-align:top; }
+.where tbody tr:first-child td { border-top:0; }
+.tablewrap { overflow-x:auto; }
+</style>
+
+<main class="page">
+  <header style="display:grid;gap:10px">
+    <span class="label">MoveMent · architecture</span>
+    <h1>How MoveMent is built</h1>
+    <p class="muted">MoveMent is a local-first web app. The code is downloaded to your phone once, and your data never leaves it. With no server of our own, it costs nothing to run.</p>
+    <nav class="toc" aria-label="Sections">
+      <a href="#picture">Big picture</a><a href="#layers">Layers</a><a href="#folders">Folders</a><a href="#feature">Inside a feature</a><a href="#flow">Logging a food</a><a href="#model">Data model</a><a href="#where">Adding things</a>
+    </nav>
+  </header>
+
+  <!-- 1 -->
+  <section class="sec" id="picture">
+    <header><h2>The big picture</h2><p class="muted">GitHub hosts the files. Your phone runs the app and keeps the data.</p></header>
+    <div class="card">
+      <div class="zones">
+        <div class="zone">
+          <span class="label">GitHub · free</span>
+          <div class="box"><b>Repo, main branch</b><span>The source code</span></div>
+          <div class="vline"></div>
+          <div class="box"><b>GitHub Actions</b><span>Runs <code>npm run build</code> on each push</span></div>
+          <div class="vline"></div>
+          <div class="box"><b>GitHub Pages</b><span>Serves the built files. Never sees your data.</span></div>
+        </div>
+        <div class="hconn" aria-hidden="true">
+          <svg viewBox="0 0 44 20"><path d="M2 10h36" stroke="#3A3D44" stroke-width="1.5" fill="none"/><path d="M34 5l6 5-6 5" stroke="#3A3D44" stroke-width="1.5" fill="none"/></svg>
+          <span>install<br>+ updates</span>
+        </div>
+        <div class="zone" style="border-color:var(--accent)">
+          <span class="label" style="color:var(--accent)">Your iPhone · Home Screen app</span>
+          <div class="box"><b>Service worker</b><span>Caches the app so it opens instantly and works offline</span></div>
+          <div class="vline"></div>
+          <div class="box hot"><b>React app</b><span>Screens: Today, Food, Train, Progress, Settings</span></div>
+          <div class="vline"></div>
+          <div class="box db"><b>IndexedDB (via Dexie)</b><span>Every food, workout and weigh-in. Stays on this phone only.</span></div>
+        </div>
+      </div>
+      <div class="zones" style="grid-template-columns:1fr 44px 1.35fr">
+        <div></div><div></div>
+        <div>
+          <span class="label">What the app talks to</span>
+          <div class="externals">
+            <div class="ext"><b>Open Food Facts</b><span>Barcodes, packaged food. No key.</span></div>
+            <div class="ext"><b>USDA FoodData</b><span>Whole foods. Free key.</span></div>
+            <div class="ext"><b>iCloud Drive / Files</b><span>Your backup JSON</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section class="sec" id="layers">
+    <header><h2>Five layers, one direction</h2><p class="muted">Each layer may only use the layers below it. The build runs a check script that fails if a file breaks this rule, so the structure can't quietly erode.</p></header>
+    <div class="card">
+      <div class="layers">
+        <div class="layer" style="--c:var(--l-app)"><span class="name">app/</span><span class="what">The shell<small>Tab bar, switching screens, which screen is open</small></span><span class="may">uses everything</span></div>
+        <div class="down" aria-hidden="true"><svg viewBox="0 0 14 20"><path d="M7 1v16M2 12l5 6 5-6" stroke="currentColor" fill="none" stroke-width="1.5"/></svg></div>
+        <div class="layer" style="--c:var(--l-feat)"><span class="name">features/</span><span class="what">The app's areas<small>today · food · training · progress · settings · body. Each has its screens and its own database actions.</small></span><span class="may">data · ui · lib<br>not each other*</span></div>
+        <div class="down" aria-hidden="true"><svg viewBox="0 0 14 20"><path d="M7 1v16M2 12l5 6 5-6" stroke="currentColor" fill="none" stroke-width="1.5"/></svg></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" class="pair">
+          <div class="layer" style="--c:var(--l-data);grid-template-columns:1fr"><span class="name">data/</span><span class="what">The database<small>Table definitions, settings, live-updating queries</small></span><span class="may" style="text-align:left">lib</span></div>
+          <div class="layer" style="--c:var(--l-ui);grid-template-columns:1fr"><span class="name">ui/</span><span class="what">Building blocks<small>Icon, Dial, Sheet, Toast, charts. Knows nothing about MoveMent, so you can reuse it in future apps.</small></span><span class="may" style="text-align:left">lib</span></div>
+        </div>
+        <div class="down" aria-hidden="true"><svg viewBox="0 0 14 20"><path d="M7 1v16M2 12l5 6 5-6" stroke="currentColor" fill="none" stroke-width="1.5"/></svg></div>
+        <div class="layer" style="--c:var(--l-lib)"><span class="name">lib/</span><span class="what">Pure math and formatting<small>Dates, number formatting, macro totals, estimated 1-rep max. No React, no database.</small></span><span class="may">nothing</span></div>
+      </div>
+      <p class="small muted">* Exception: <code>features/body</code> (the weigh-in sheet) is shared because both Today and Progress use it.</p>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section class="sec" id="folders">
+    <header><h2>The folders</h2><p class="muted">Colors match the layers above.</p></header>
+<div class="tree" role="figure" aria-label="Project folder tree">MoveMent/
+├── <span class="d">src/</span>
+│   ├── main.tsx                     <span class="c">starts the app, asks iOS to keep data</span>
+│   ├── <span class="d app">app/</span>
+│   │   ├── App.tsx                  <span class="c">tab bar + screen switcher</span>
+│   │   └── routes.ts                <span class="c">list of screens and tabs</span>
+│   ├── <span class="d feat">features/</span>
+│   │   ├── <span class="feat">today/</span>     TodayScreen
+│   │   ├── <span class="feat">food/</span>      FoodScreen, EditLogSheet, foodActions, foodApi
+│   │   │   └── <span class="feat">add/</span>   AddFoodSheet → Search / Scan / Amount / Custom steps
+│   │   ├── <span class="feat">training/</span>  TrainScreen, ActiveWorkout, RoutineEditor,
+│   │   │                ExercisePicker, WorkoutDetail, trainingActions
+│   │   ├── <span class="feat">progress/</span>  ProgressScreen
+│   │   ├── <span class="feat">settings/</span>  SettingsScreen, backup, units
+│   │   └── <span class="feat">body/</span>      WeighInSheet, bodyActions   <span class="c">(shared)</span>
+│   ├── <span class="d data">data/</span>
+│   │   ├── db.ts                    <span class="c">tables + types (schema versions)</span>
+│   │   ├── settings.ts              <span class="c">targets, units, API key</span>
+│   │   └── hooks.ts                 <span class="c">useSettings, useExercises, useActiveWorkout</span>
+│   ├── <span class="d ui">ui/</span>          Icon, Dial, Sheet, Toast, ConfirmButton, NumInput, charts
+│   ├── <span class="d lib">lib/</span>         dates, format, macros, strength
+│   └── <span class="d">styles/</span>      tokens.css <span class="c">(your style guide)</span>, app.css
+├── scripts/check-architecture.mjs   <span class="c">enforces the layer rules</span>
+├── .github/workflows/deploy.yml     <span class="c">build + publish to Pages</span>
+├── .claude/skills/personal-ui-style <span class="c">your style guide skill</span>
+├── design/                          <span class="c">style pickers, style guide, this page</span>
+└── ARCHITECTURE.md · CLAUDE.md · README.md</div>
+  </section>
+
+  <!-- 4 -->
+  <section class="sec" id="feature">
+    <header><h2>Inside a feature</h2><p class="muted">Every feature follows the same three-part pattern, shown here with food.</p></header>
+    <div class="card">
+      <div class="anatomy">
+        <div class="box"><span class="label" style="--c:var(--l-feat)">Screens &amp; sheets</span><b>FoodScreen, EditLogSheet, add/*</b><span>Draw the page. <em>Read</em> data with live queries that update on their own.</span></div>
+        <div class="box hot"><span class="label" style="--c:var(--accent)">Actions</span><b>foodActions.ts</b><span>The <em>only</em> place this feature writes to the database: logFood, copyDay, updateLog, removeLog.</span></div>
+        <div class="box"><span class="label" style="--c:var(--l-feat)">Outside services</span><b>foodApi.ts</b><span>Talks to Open Food Facts and USDA and turns their answers into MoveMent foods.</span></div>
+      </div>
+      <div class="arrowrow" aria-hidden="true"><span>reads ↓ data/ · writes → actions</span><span>writes ↓ data/</span><span>fetches ↗ internet</span></div>
+      <p class="small muted">Why it helps: when something saves wrong, there's exactly one file to look in. Screens stay simple because they never juggle saving and re-loading.</p>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section class="sec" id="flow">
+    <header><h2>One action, start to finish: logging a food</h2></header>
+    <div class="card">
+      <div class="seq">
+        <div class="step"><div><span class="who">You</span><span>Pick “Protein bar”, enter 2 servings, tap <b>Add to breakfast</b>.</span></div></div>
+        <div class="step"><div><span class="who">AmountStep.tsx (screen)</span><span>Calls <code>logFood(food, 120 g, "breakfast", today)</code>. It doesn't touch the database itself.</span></div></div>
+        <div class="step"><div><span class="who">foodActions.ts</span><span>Saves the food if it's new, or bumps it up your “Recent” list.</span></div></div>
+        <div class="step"><div><span class="who">foodActions.ts → IndexedDB</span><span>Adds a food log with its own copy of the calories and macros, so editing the food later never changes past days.</span></div></div>
+        <div class="step"><div><span class="who">IndexedDB → live queries</span><span>Every screen watching today's logs is told something changed.</span></div></div>
+        <div class="step"><div><span class="who">Today + Food screens</span><span>Dials, totals and meal list redraw with the new numbers. No manual refresh code anywhere.</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section class="sec" id="model">
+    <header><h2>Data model</h2><p class="muted">Eight tables in the phone's database. Orange fields point to another table.</p></header>
+    <div class="tables">
+      <div class="tbl"><h3>foods <span>food definitions</span></h3><ul><li><b>id</b></li><li><b>name</b>, brand, barcode</li><li><b>source</b> off · usda · custom</li><li><b>per100</b> kcal p c f</li><li>servingG, servingLabel</li><li>lastUsed, useCount</li></ul></div>
+      <div class="tbl"><h3>foodLogs <span>what you ate</span></h3><ul><li><b>id</b></li><li><b>date</b> YYYY-MM-DD</li><li><b>meal</b></li><li><span class="fk">foodId → foods</span></li><li>name, grams</li><li><b>kcal p c f</b> (snapshot)</li></ul></div>
+      <div class="tbl"><h3>exercises <span>the catalog</span></h3><ul><li><b>id</b></li><li><b>name</b></li><li><b>kind</b> weight · bodyweight · cardio</li></ul></div>
+      <div class="tbl"><h3>routines <span>saved plans</span></h3><ul><li><b>id</b>, name</li><li><b>items[]</b></li><li>&nbsp;&nbsp;<span class="fk">exerciseId → exercises</span></li><li>&nbsp;&nbsp;sets, reps</li></ul></div>
+      <div class="tbl"><h3>workouts <span>sessions</span></h3><ul><li><b>id</b>, name, date</li><li><span class="fk">routineId → routines</span></li><li>startedAt</li><li><b>finishedAt</b> (empty = in progress)</li></ul></div>
+      <div class="tbl"><h3>sets <span>every set</span></h3><ul><li><b>id</b>, order</li><li><span class="fk">workoutId → workouts</span></li><li><span class="fk">exerciseId → exercises</span></li><li>weight, reps · minutes, distance</li><li><b>done</b></li></ul></div>
+      <div class="tbl"><h3>weights <span>weigh-ins</span></h3><ul><li><b>date</b> (one per day)</li><li><b>weight</b></li></ul></div>
+      <div class="tbl"><h3>settings <span>key → value</span></h3><ul><li><b>targets</b> kcal p c f</li><li><b>unit</b> lb · kg</li><li>usdaKey, lastBackup</li></ul></div>
+    </div>
+    <p class="small muted">Changing tables means adding a new schema version in <code>data/db.ts</code>. Phones that already have data upgrade one step at a time, so nothing is lost.</p>
+  </section>
+
+  <!-- 7 -->
+  <section class="sec" id="where">
+    <header><h2>Where new things go</h2></header>
+    <div class="card tablewrap">
+      <table class="where">
+        <thead><tr><th>You're adding…</th><th>Put it in</th></tr></thead>
+        <tbody>
+          <tr><td>A new area, like Activity / Apple Health import</td><td><code>features/activity/</code> with a screen and <code>activityActions.ts</code>, plus a tab in <code>app/routes.ts</code></td></tr>
+          <tr><td>A new kind of data</td><td>A new schema version in <code>data/db.ts</code></td></tr>
+          <tr><td>A generic widget (new chart, picker, button style)</td><td><code>ui/</code>, colored from <code>styles/tokens.css</code></td></tr>
+          <tr><td>A calculation (TDEE, pace, streaks)</td><td><code>lib/</code> as a pure function</td></tr>
+          <tr><td>Something two features both need</td><td>A shared feature like <code>features/body</code>, added to the check script's shared list</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
