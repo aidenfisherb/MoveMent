@@ -1,6 +1,6 @@
 ---
 name: personal-ui-style
-description: Aiden's personal visual style for any website, web app, dashboard, or UI component (true-black background, "Blaze" orange accent, Manrope + JetBrains Mono, outlined cards, pill buttons, compact lists, dial charts). Use whenever building or restyling any interface for Aiden unless he asks for a different look in that request.
+description: Aiden's personal visual style for any website, web app, dashboard, or UI component (true-black background, "Blaze" orange accent, Manrope + JetBrains Mono, outlined cards, pill buttons, compact lists, dial charts). Use whenever building or restyling any interface for Aiden unless the request asks for a different look.
 ---
 
 # Personal UI Style Guide
