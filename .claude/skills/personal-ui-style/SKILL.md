@@ -5,6 +5,8 @@ description: Aiden's personal visual style for any website, web app, dashboard, 
 
 # Personal UI Style Guide
 
+**Version 1.1** · see the Changelog at the end. Rules in §13 (Learned preferences) override earlier sections when they conflict.
+
 This file defines the visual style for every interface built for me. Follow it exactly unless my request explicitly says otherwise. This is a general system for every project, not tied to any one app. If something you need isn't covered here, extend the system in the same spirit (dark, sharp contrast, one orange accent, quiet everywhere else) rather than inventing a new look.
 
 ## 1. Personality in one paragraph
@@ -207,3 +209,37 @@ body { margin:0; background:var(--bg); color:var(--fg); font:400 14px/1.5 var(--
 ```
 
 **Tailwind users:** map the tokens above into `theme.extend.colors` (`bg`, `surface`, `line`, `fg`, `muted`, `accent`, etc.), `fontFamily.sans = Manrope…`, `fontFamily.mono = JetBrains Mono…`, and `borderRadius.card = 10px`.
+
+## 12. Keeping this guide up to date
+
+This guide is meant to grow as I use it. You cannot edit the installed copy yourself, so follow this protocol in every session that uses this skill:
+
+**When to propose an update.** Only for lasting style preferences, not one-off requests. Propose one when:
+- I say something general about my taste ("I hate X", "always do Y", "I like how this looks, use it everywhere").
+- I correct the same kind of thing twice in a session (e.g. I ask twice for more spacing).
+- I approve a new component or pattern this guide doesn't cover yet (e.g. a calendar, a stepper, a login screen) and it should be reused.
+
+Do **not** record requests tied to one project ("make this page blue for the client"), and never record anything I didn't say or approve.
+
+**How to propose it.** At the end of your reply (not mid-task), add a short block:
+
+> **Style guide update?** I noticed: <the preference, in my words>. Proposed change: <exact rule to add or edit, and which section>. Say "add it" to include it.
+
+Ask at most once per preference, and batch several into one block.
+
+**When I say yes:**
+- If you can edit files (e.g. Claude Code with the repo that holds this skill): edit `SKILL.md` directly. Put new rules in §13, or edit the relevant section if the rule changes an existing value. Bump the version (minor for additions, major if a core choice in §2 or §3 changes), add a Changelog line, and commit. Then tell me to re-upload the skill.
+- If you cannot edit files (regular chat): output only the changed parts as ready-to-paste text: the new §13 entries, any edited lines with their section number, and the Changelog line. Remind me to update the master copy and re-upload.
+
+**Keep it clean.** If a new preference contradicts an older one, replace the old rule instead of stacking both. If §13 grows past about 15 entries, suggest folding them into the main sections.
+
+## 13. Learned preferences
+
+Newest first. Each entry: date, rule, short reason or context.
+
+- *(none yet)*
+
+## Changelog
+
+- **1.1** (2026-11-09): Added the update protocol (§12) and Learned preferences (§13).
+- **1.0** (2026-11-09): First version, from two rounds of picks: Dark Athletic palette; Manrope + JetBrains Mono; 10px corners; outline-only cards; solid pill buttons; three-dial progress; compact density; Blaze orange `#FF5A1F`; true black background.
