@@ -17,6 +17,8 @@ export interface Food {
   /** Default serving in grams, plus a human label like "1 bar (40 g)". */
   servingG?: number;
   servingLabel?: string;
+  /** True when the numbers came from an AI photo estimate. */
+  ai?: boolean;
   lastUsed?: number;
   useCount?: number;
 }
@@ -62,6 +64,15 @@ export interface WorkoutSet {
 
 export interface BodyWeight { date: string; weight: number }
 
+/** A progress photo. Stored resized (about 1600px) plus a small thumbnail for the grid. */
+export interface Photo {
+  id?: number;
+  date: string;
+  image: Blob;
+  thumb: Blob;
+  createdAt: number;
+}
+
 export interface Setting { key: string; value: unknown }
 
 class MoveMentDB extends Dexie {
@@ -73,6 +84,7 @@ class MoveMentDB extends Dexie {
   sets!: Table<WorkoutSet, number>;
   weights!: Table<BodyWeight, string>;
   settings!: Table<Setting, string>;
+  photos!: Table<Photo, number>;
 
   constructor() {
     super("movement");
@@ -86,6 +98,8 @@ class MoveMentDB extends Dexie {
       weights: "date",
       settings: "key"
     });
+    // v2: progress photos. Add new versions below; never edit an earlier one.
+    this.version(2).stores({ photos: "++id, date" });
     this.on("populate", (tx) => {
       const starter: Exercise[] = [
         ["Bench press", "weight"], ["Incline dumbbell press", "weight"], ["Overhead press", "weight"],

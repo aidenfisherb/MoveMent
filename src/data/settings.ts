@@ -5,6 +5,9 @@ export interface Settings {
   unit: "lb" | "kg";
   usdaKey: string;
   lastBackup?: number;
+  lastPhotoBackup?: number;
+  name?: string;
+  heightCm?: number;
 }
 
 export const DEFAULT_SETTINGS: Settings = {

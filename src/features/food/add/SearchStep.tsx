@@ -6,7 +6,7 @@ import { Icon } from "../../../ui";
 import { FoodList, MealChips } from "../components";
 import { searchOff, searchUsda } from "../foodApi";
 
-export function SearchStep({ meal, setMeal, onPick, onScan, onCustom }: { meal: Meal; setMeal: (m: Meal) => void; onPick: (f: Food) => void; onScan: () => void; onCustom: (name: string) => void }) {
+export function SearchStep({ meal, setMeal, onPick, onScan, onCustom, onPaste }: { meal: Meal; setMeal: (m: Meal) => void; onPick: (f: Food) => void; onScan: () => void; onCustom: (name: string) => void; onPaste: () => void }) {
   const settings = useSettings();
   const [q, setQ] = useState("");
   const [online, setOnline] = useState<{ off: Food[]; usda: Food[]; loading: boolean; error: string }>({ off: [], usda: [], loading: false, error: "" });
@@ -48,9 +48,10 @@ export function SearchStep({ meal, setMeal, onPick, onScan, onCustom }: { meal: 
   return (
     <>
       <MealChips meal={meal} setMeal={setMeal} />
-      <div style={{ display: "flex", gap: 8 }}>
-        <input className="input" autoFocus type="search" placeholder="Search foods" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search foods" />
-        <button className="btn icon-btn" style={{ width: 40, height: 40 }} type="button" aria-label="Scan barcode" onClick={onScan}><Icon name="scan" /></button>
+      <input className="input" type="search" placeholder="Search foods" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search foods" />
+      <div className="quick-actions">
+        <button className="btn" type="button" onClick={onScan}><Icon name="scan" />Scan</button>
+        <button className="btn" type="button" onClick={onPaste}><Icon name="sparkle" />Paste from Claude</button>
       </div>
 
       {localResults.length > 0 && (
