@@ -1,12 +1,15 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import { useState } from "react";
-import type { Route } from "../App";
-import { Dial, Icon, NumInput, Sheet, toast } from "../components/ui";
-import { db, MEALS } from "../lib/db";
-import { useActiveWorkout, useSettings } from "../lib/hooks";
-import { addDays, cap, dayKey, fmt, parseDay, sumMacros } from "../lib/util";
+import type { Route } from "../../app/routes";
+import { db, MEALS } from "../../data/db";
+import { useActiveWorkout, useSettings } from "../../data/hooks";
+import { addDays, dayKey, parseDay } from "../../lib/dates";
+import { cap, fmt } from "../../lib/format";
+import { sumMacros } from "../../lib/macros";
+import { Dial, Icon } from "../../ui";
+import { WeighInSheet } from "../body/WeighInSheet";
 
-export default function Today({ go }: { go: (r: Route) => void }) {
+export default function TodayScreen({ go }: { go: (r: Route) => void }) {
   const today = dayKey();
   const settings = useSettings();
   const t = settings.targets;
@@ -100,27 +103,7 @@ export default function Today({ go }: { go: (r: Route) => void }) {
         )}
       </section>
 
-      <WeighIn open={weighOpen} onClose={() => setWeighOpen(false)} unit={settings.unit} initial={latest?.weight} />
+      <WeighInSheet open={weighOpen} onClose={() => setWeighOpen(false)} unit={settings.unit} initial={latest?.weight} />
     </main>
-  );
-}
-
-export function WeighIn({ open, onClose, unit, initial }: { open: boolean; onClose: () => void; unit: string; initial?: number }) {
-  const [w, setW] = useState<number | undefined>(initial);
-  const [date, setDate] = useState(dayKey());
-  const save = async () => {
-    if (!w || w <= 0) return;
-    await db.weights.put({ date, weight: w });
-    toast("Weight saved");
-    onClose();
-  };
-  return (
-    <Sheet open={open} onClose={onClose} title="Weigh in">
-      <div className="grid2">
-        <div className="field"><label className="label" htmlFor="wi-w">Weight ({unit})</label><NumInput id="wi-w" value={w} onChange={setW} placeholder="0.0" /></div>
-        <div className="field"><label className="label" htmlFor="wi-d">Date</label><input id="wi-d" className="input num" type="date" value={date} max={dayKey()} onChange={(e) => setDate(e.target.value)} /></div>
-      </div>
-      <button className="btn btn-primary btn-full" type="button" disabled={!w} onClick={save}>Save weight</button>
-    </Sheet>
   );
 }

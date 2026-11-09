@@ -1,4 +1,4 @@
-import { fmt } from "../lib/util";
+import { fmt } from "../lib/format";
 
 export interface Point { x: string; y: number }
 

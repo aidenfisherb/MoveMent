@@ -1,15 +1,17 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import { useMemo, useState } from "react";
-import { BarChart, LineChart } from "../components/charts";
-import { Icon } from "../components/ui";
-import { db } from "../lib/db";
-import { useExercises, useSettings } from "../lib/hooks";
-import { addDays, dayKey, e1rm, fmt, parseDay, sumMacros } from "../lib/util";
-import { WeighIn } from "./Today";
+import { db } from "../../data/db";
+import { useExercises, useSettings } from "../../data/hooks";
+import { addDays, dayKey, parseDay } from "../../lib/dates";
+import { fmt } from "../../lib/format";
+import { sumMacros } from "../../lib/macros";
+import { e1rm } from "../../lib/strength";
+import { BarChart, Icon, LineChart } from "../../ui";
+import { WeighInSheet } from "../body/WeighInSheet";
 
 const short = (key: string) => parseDay(key).toLocaleDateString(undefined, { month: "numeric", day: "numeric" });
 
-export default function Progress() {
+export default function ProgressScreen() {
   const settings = useSettings();
   const [range, setRange] = useState<30 | 90 | 365>(90);
   const [weighOpen, setWeighOpen] = useState(false);
@@ -124,7 +126,7 @@ export default function Progress() {
         </section>
       )}
 
-      <WeighIn open={weighOpen} onClose={() => setWeighOpen(false)} unit={settings.unit} initial={weights[weights.length - 1]?.weight} />
+      <WeighInSheet open={weighOpen} onClose={() => setWeighOpen(false)} unit={settings.unit} initial={weights[weights.length - 1]?.weight} />
     </main>
   );
 }

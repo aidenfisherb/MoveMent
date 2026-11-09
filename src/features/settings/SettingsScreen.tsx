@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import type { Route } from "../App";
-import { ConfirmButton, Icon, NumInput, toast } from "../components/ui";
-import { db, saveSetting, type Macros } from "../lib/db";
-import { useSettings } from "../lib/hooks";
-import { dayKey, fmt } from "../lib/util";
-
-const TABLES = ["foods", "foodLogs", "exercises", "routines", "workouts", "sets", "weights", "settings"] as const;
+import type { Route } from "../../app/routes";
+import type { Macros } from "../../data/db";
+import { useSettings } from "../../data/hooks";
+import { saveSetting } from "../../data/settings";
+import { fmt } from "../../lib/format";
+import { ConfirmButton, Icon, NumInput, toast } from "../../ui";
+import { exportBackup, readBackupFile, restoreBackup, type Backup } from "./backup";
+import { switchUnit } from "./units";
 
 export default function SettingsScreen({ go }: { go: (r: Route) => void }) {
   const s = useSettings();
@@ -13,7 +14,7 @@ export default function SettingsScreen({ go }: { go: (r: Route) => void }) {
   const [key, setKey] = useState(s.usdaKey);
   const [persisted, setPersisted] = useState<boolean | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
-  const [pendingImport, setPendingImport] = useState<Record<string, unknown[]> | null>(null);
+  const [pendingImport, setPendingImport] = useState<Backup | null>(null);
 
   useEffect(() => setT(s.targets), [s.targets]);
   useEffect(() => setKey(s.usdaKey), [s.usdaKey]);
@@ -23,59 +24,24 @@ export default function SettingsScreen({ go }: { go: (r: Route) => void }) {
 
   const saveTargets = async () => { await saveSetting("targets", t); toast("Targets saved"); };
 
-  const switchUnit = async (unit: "lb" | "kg") => {
-    if (unit === s.unit) return;
-    const k = unit === "kg" ? 1 / 2.20462 : 2.20462;
-    const r = (v: number) => Math.round(v * k * 10) / 10;
-    await db.transaction("rw", db.weights, db.sets, db.settings, async () => {
-      await db.weights.toCollection().modify((w) => { w.weight = r(w.weight); });
-      await db.sets.toCollection().modify((x) => { if (x.weight) x.weight = r(x.weight); });
-      await saveSetting("unit", unit);
-    });
-    toast(`Switched to ${unit}; past entries converted`);
-  };
-
   const exportData = async () => {
-    const data: Record<string, unknown> = { app: "movement", version: 1, exportedAt: new Date().toISOString() };
-    for (const name of TABLES) data[name] = await db.table(name).toArray();
-    const json = JSON.stringify(data);
-    const filename = `movement-backup-${dayKey()}.json`;
-    const file = new File([json], filename, { type: "application/json" });
-    // On iPhone the share sheet is the reliable way to save to Files / iCloud Drive.
-    if (navigator.canShare?.({ files: [file] })) {
-      try { await navigator.share({ files: [file], title: "MoveMent backup" }); }
-      catch (e) { if ((e as Error).name === "AbortError") return; }
-    } else {
-      const url = URL.createObjectURL(file);
-      const a = document.createElement("a");
-      a.href = url; a.download = filename; a.click();
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-    }
-    await saveSetting("lastBackup", Date.now());
-    toast("Backup created");
+    if (await exportBackup()) toast("Backup created");
   };
-
   const readImport = async (f: File) => {
-    try {
-      const data = JSON.parse(await f.text());
-      if (data.app !== "movement") throw new Error();
-      setPendingImport(data);
-    } catch {
-      toast("That file isn't a MoveMent backup", { error: true });
-    }
+    const data = await readBackupFile(f);
+    if (data) setPendingImport(data);
+    else toast("That file isn't a MoveMent backup", { error: true });
   };
-
   const doImport = async () => {
     if (!pendingImport) return;
-    await db.transaction("rw", TABLES.map((n) => db.table(n)), async () => {
-      for (const name of TABLES) {
-        await db.table(name).clear();
-        const rows = pendingImport[name];
-        if (Array.isArray(rows) && rows.length) await db.table(name).bulkAdd(rows);
-      }
-    });
+    await restoreBackup(pendingImport);
     setPendingImport(null);
     toast("Backup restored");
+  };
+  const changeUnit = async (unit: "lb" | "kg") => {
+    if (unit === s.unit) return;
+    await switchUnit(unit);
+    toast(`Switched to ${unit}; past entries converted`);
   };
 
   const daysSinceBackup = s.lastBackup ? Math.floor((Date.now() - s.lastBackup) / 86400000) : null;
@@ -110,7 +76,7 @@ export default function SettingsScreen({ go }: { go: (r: Route) => void }) {
 
       <section className="card">
         <div className="card-head"><h2>Units</h2>
-          <div className="seg">{(["lb", "kg"] as const).map((u) => <button key={u} type="button" aria-pressed={s.unit === u} onClick={() => switchUnit(u)}>{u}</button>)}</div>
+          <div className="seg">{(["lb", "kg"] as const).map((u) => <button key={u} type="button" aria-pressed={s.unit === u} onClick={() => changeUnit(u)}>{u}</button>)}</div>
         </div>
         <span className="small muted">Switching converts your past weigh-ins and lifts.</span>
       </section>

@@ -1,0 +1,14 @@
+/* Tokens from the personal-ui-style skill (v1.1). */
+:root {
+  --bg: #000000; --surface: #0E0F11; --surface-2: #17181B;
+  --line: #2A2C31; --line-strong: #3A3D44;
+  --fg: #F2F2F2; --muted: #8B8E96; --faint: #5A5D64;
+  --accent: #FF5A1F; --accent-hover: #FF7340; --accent-dim: rgba(255, 90, 31, .14); --on-accent: #000000;
+  --success: #3DDC84; --warning: #FFC233; --danger: #FF4D6A;
+  --series-1: #FF5A1F; --series-2: #F2F2F2; --series-3: #6C7080; --grid: #1A1B1E;
+  --font-text: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-num: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --r-card: 10px; --r-input: 8px; --r-pill: 9999px;
+  --tabbar-h: 56px;
+  color-scheme: dark;
+}

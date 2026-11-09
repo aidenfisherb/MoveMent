@@ -1,5 +1,6 @@
-import { db, type Routine, type WorkoutSet } from "./db";
-import { dayKey, e1rm } from "./util";
+import { db, type Routine, type WorkoutSet } from "../../data/db";
+import { dayKey } from "../../lib/dates";
+import { e1rm } from "../../lib/strength";
 
 /** Most recent finished-workout sets for an exercise, for "last time" hints and prefilling. */
 export async function lastSetsFor(exerciseId: number, excludeWorkoutId?: number): Promise<WorkoutSet[]> {

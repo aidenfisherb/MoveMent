@@ -1,22 +1,15 @@
 import { useEffect, useState } from "react";
-import { Icon, ToastHost } from "./components/ui";
-import Today from "./screens/Today";
-import FoodScreen from "./screens/Food";
-import Train from "./screens/Train";
-import Progress from "./screens/Progress";
-import SettingsScreen from "./screens/Settings";
-
-export type Route = "today" | "food" | "train" | "progress" | "settings";
-const TABS: { id: Route; label: string; icon: string }[] = [
-  { id: "today", label: "Today", icon: "home" },
-  { id: "food", label: "Food", icon: "food" },
-  { id: "train", label: "Train", icon: "dumbbell" },
-  { id: "progress", label: "Progress", icon: "chart" }
-];
+import { Icon, ToastHost } from "../ui";
+import TodayScreen from "../features/today/TodayScreen";
+import FoodScreen from "../features/food/FoodScreen";
+import TrainScreen from "../features/training/TrainScreen";
+import ProgressScreen from "../features/progress/ProgressScreen";
+import SettingsScreen from "../features/settings/SettingsScreen";
+import { ROUTES, TABS, type Route } from "./routes";
 
 const readHash = (): Route => {
   const h = location.hash.slice(1) as Route;
-  return ["today", "food", "train", "progress", "settings"].includes(h) ? h : "today";
+  return ROUTES.includes(h) ? h : "today";
 };
 
 export default function App() {
@@ -33,10 +26,10 @@ export default function App() {
 
   return (
     <div className="app">
-      {route === "today" && <Today go={go} />}
+      {route === "today" && <TodayScreen go={go} />}
       {route === "food" && <FoodScreen />}
-      {route === "train" && <Train />}
-      {route === "progress" && <Progress />}
+      {route === "train" && <TrainScreen />}
+      {route === "progress" && <ProgressScreen />}
       {route === "settings" && <SettingsScreen go={go} />}
       <div className="tabbar">
         <nav aria-label="Main">

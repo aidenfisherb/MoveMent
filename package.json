@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "check": "node scripts/check-architecture.mjs && tsc -b",
+    "build": "node scripts/check-architecture.mjs && tsc -b && vite build",
     "preview": "vite preview"
   },
   "dependencies": {

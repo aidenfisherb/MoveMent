@@ -1,4 +1,4 @@
-import type { Food, Macros } from "./db";
+import type { Food, Macros } from "../../data/db";
 
 /**
  * Free food data sources:
