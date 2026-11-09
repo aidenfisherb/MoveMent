@@ -1,0 +1,150 @@
+<title>MoveMent Style Round 2</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;800&family=Geist+Mono:wght@400;600&family=Manrope:wght@400;600;800&family=JetBrains+Mono:wght@400;600&family=Sora:wght@400;600;800&family=DM+Mono:wght@400;500&family=Rubik:wght@400;600;800&family=Archivo:wdth,wght@112,400;112,600;112,800&family=Lexend:wght@400;600;800&family=Barlow+Condensed:wght@600;800&family=Barlow:wght@400;600&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a single dark page in the user's chosen palette; each section is one design decision with side-by-side options. */
+:root {
+  --bg: #141518; --card: #1c1e22; --raise: #23262b; --line: #2a2c31; --fg: #f2f2f2; --muted: #8b8e96; --accent: #ff5a1f; --on-accent: #141518;
+  --ui: "Geist", system-ui, sans-serif; --mono: "Geist Mono", ui-monospace, monospace;
+  color-scheme: dark;
+}
+body { background: var(--bg); color: var(--fg); font-family: var(--ui); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-block: 32px 120px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 48px; }
+.intro { max-width: 68ch; display: grid; gap: 8px; }
+.intro h1 { margin: 0; font-size: 28px; line-height: 1.15; text-wrap: balance; }
+.intro p { margin: 0; color: var(--muted); }
+section.q { display: grid; gap: 14px; }
+.qhead { display: grid; gap: 4px; max-width: 70ch; }
+.qhead h2 { margin: 0; font-size: 18px; }
+.qhead h2 span { color: var(--accent); font-family: var(--mono); font-size: 13px; margin-right: 8px; }
+.qhead p { margin: 0; color: var(--muted); font-size: 14px; }
+.opts { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 14px; }
+.opt { display: grid; gap: 8px; align-content: start; min-width: 0; cursor: pointer; border: 2px solid transparent; border-radius: 10px; padding: 8px; background: transparent; color: inherit; font: inherit; text-align: left; }
+.opt:hover { border-color: var(--line); }
+.opt[aria-pressed="true"] { border-color: var(--accent); }
+.opt:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+.opt .cap { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; color: var(--muted); }
+.opt .cap b { color: var(--fg); font-weight: 600; }
+.note { width: 100%; box-sizing: border-box; font: inherit; font-size: 13px; padding: 8px 10px; border: 1px solid var(--line); background: var(--card); color: var(--fg); border-radius: 6px; }
+.tray { position: fixed; left: 0; right: 0; bottom: 0; background: var(--card); border-top: 1px solid var(--line); padding-block: 12px calc(12px + env(safe-area-inset-bottom, 0px)); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; z-index: 5; }
+.tray span { color: var(--muted); font-size: 13px; }
+.tray button { font: inherit; font-weight: 600; padding: 8px 14px; border-radius: 6px; border: 0; background: var(--accent); color: var(--on-accent); cursor: pointer; }
+#out { width: 100%; min-height: 140px; box-sizing: border-box; font: 12px/1.5 var(--mono); background: var(--card); color: var(--fg); border: 1px solid var(--line); border-radius: 6px; padding: 8px; }
+
+/* Sample tile shared by all options */
+.tile { --r: 10px; --h: var(--ui); --b: var(--ui); --n: var(--ui); --hw: 800; --tt: none; --ls: 0; background: var(--card); border-radius: var(--r); padding: 14px; display: grid; gap: 10px; font-family: var(--b); min-height: 150px; box-sizing: border-box; }
+.tile .h { font-family: var(--h); font-weight: var(--hw); font-size: 18px; text-transform: var(--tt); letter-spacing: var(--ls); line-height: 1.1; }
+.tile .num { font-family: var(--n); font-weight: 800; font-size: 34px; line-height: 1; color: var(--accent); font-variant-numeric: tabular-nums; }
+.tile .sm { font-size: 12px; color: var(--muted); }
+.tile .row { display: flex; justify-content: space-between; font-size: 13px; border-top: 1px solid var(--line); padding-top: 8px; }
+.tile .row em { font-style: normal; font-family: var(--n); font-variant-numeric: tabular-nums; }
+.lbl { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 16px; font-weight: 700; font-size: 13px; }
+.bar { height: 8px; background: var(--line); border-radius: 99px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--accent); border-radius: inherit; }
+.mrow { display: grid; grid-template-columns: 16px 1fr 58px; gap: 8px; align-items: center; font-size: 12px; font-variant-numeric: tabular-nums; }
+.mrow b { text-align: right; font-weight: 600; }
+svg text { fill: var(--fg); }
+</style>
+
+<div class="wrap">
+  <header class="intro">
+    <h1>Round 2: build your look piece by piece</h1>
+    <p>The charcoal-and-orange colors stay fixed. Each section below is one decision. Tap the option you like best (tap again to unselect). Add a note if two were close or something bugged you.</p>
+    <p>When you're done, press "Copy my picks" at the bottom and paste the result into the chat.</p>
+  </header>
+  <div id="qs" class="wrap" style="padding:0;gap:48px"></div>
+  <textarea id="out" readonly hidden aria-label="Your picks"></textarea>
+</div>
+<div class="tray"><span id="count"></span><button type="button" id="copy">Copy my picks</button></div>
+
+<script>
+const tile = (style = "", extra = "") => `<div class="tile" style="${style}">
+  <div class="h">Push day</div>
+  <div><div class="num">2,400</div><div class="sm">kcal target · 142 g protein</div></div>
+  <div class="row"><span>Bench press</span><em>3 × 8 · 185 lb</em></div>${extra}
+</div>`;
+
+const ring = (pct, color, r) => { const c = 2 * Math.PI * r; return `<circle cx="50" cy="50" r="${r}" fill="none" stroke="var(--line)" stroke-width="8"/><circle cx="50" cy="50" r="${r}" fill="none" stroke="${color}" stroke-width="8" stroke-linecap="round" stroke-dasharray="${c * pct} ${c}" transform="rotate(-90 50 50)"/>`; };
+const macros = [["P", .78, "142/180g"], ["C", .64, "166/260g"], ["F", .81, "57/70g"]];
+const mcolors = ["var(--accent)", "#f2f2f2", "#6c7080"];
+
+const Q = [
+  { id: "font", t: "Fonts", d: "Heading, body text, and numbers. This choice changes the feel of the whole app the most.",
+    o: [
+      ["Geist + Geist Mono", "clean, modern, techy", tile("--h:'Geist';--b:'Geist';--n:'Geist Mono'")],
+      ["Manrope + JetBrains Mono", "rounded, friendly", tile("--h:'Manrope';--b:'Manrope';--n:'JetBrains Mono'")],
+      ["Sora + DM Mono", "geometric, wide", tile("--h:'Sora';--b:'Sora';--n:'DM Mono'")],
+      ["Rubik", "soft corners, sporty", tile("--h:'Rubik';--b:'Rubik';--n:'Rubik'")],
+      ["Archivo Wide", "stretched, bold, athletic", tile("--h:'Archivo';--b:'Archivo';--n:'Archivo';--tt:uppercase;--ls:.02em")],
+      ["Lexend", "very readable, plain", tile("--h:'Lexend';--b:'Lexend';--n:'Lexend'")],
+      ["Barlow Condensed (round 1)", "for comparison", tile("--h:'Barlow Condensed';--b:'Barlow';--n:'Barlow Condensed';--tt:uppercase")],
+      ["IBM Plex Mono only", "all monospace, data-heavy", tile("--h:'IBM Plex Mono';--b:'IBM Plex Mono';--n:'IBM Plex Mono';--hw:600")]
+    ] },
+  { id: "radius", t: "Corners", d: "How rounded cards and buttons are.",
+    o: [["Sharp", "0 px", tile("--r:0")], ["Slight", "4 px", tile("--r:4px")], ["Medium", "10 px", tile("--r:10px")], ["Round", "20 px", tile("--r:20px")]] },
+  { id: "card", t: "Card style", d: "How a card separates from the background.",
+    o: [
+      ["Flat fill", "lighter gray block, no border", tile()],
+      ["Outline only", "same color as background, thin border", tile("background:var(--bg);border:1px solid var(--line)")],
+      ["Fill + border", "lighter block with a thin edge", tile("border:1px solid #33363c")],
+      ["Lifted", "subtle top highlight and shadow", tile("background:linear-gradient(180deg,#22252a,#1a1c20);box-shadow:0 1px 0 rgba(255,255,255,.06) inset,0 8px 24px rgba(0,0,0,.45)")],
+      ["Orange header", "title sits in a colored band", `<div class="tile" style="padding:0;overflow:hidden"><div class="h" style="background:var(--accent);color:var(--on-accent);padding:10px 14px">Push day</div><div style="padding:0 14px 14px;display:grid;gap:10px"><div><div class="num">2,400</div><div class="sm">kcal target · 142 g protein</div></div><div class="row"><span>Bench press</span><em>3 × 8 · 185 lb</em></div></div></div>`]
+    ] },
+  { id: "button", t: "Buttons", d: "The main action button and its secondary partner.",
+    o: [
+      ["Solid pill", "fully rounded", `<div class="tile" style="align-content:center;gap:10px"><span class="btn" style="background:var(--accent);color:var(--on-accent);border-radius:99px">Log food</span><span class="btn" style="border:1px solid var(--line);border-radius:99px">Add set</span></div>`],
+      ["Solid block", "square-ish", `<div class="tile" style="align-content:center;gap:10px"><span class="btn" style="background:var(--accent);color:var(--on-accent);border-radius:4px">Log food</span><span class="btn" style="background:var(--raise);border-radius:4px">Add set</span></div>`],
+      ["Outline", "orange border, no fill", `<div class="tile" style="align-content:center;gap:10px"><span class="btn" style="border:1.5px solid var(--accent);color:var(--accent);border-radius:8px">Log food</span><span class="btn" style="border:1px solid var(--line);color:var(--muted);border-radius:8px">Add set</span></div>`],
+      ["Uppercase bold", "loud, gym-poster feel", `<div class="tile" style="align-content:center;gap:10px"><span class="btn" style="background:var(--accent);color:var(--on-accent);border-radius:2px;text-transform:uppercase;letter-spacing:.08em;font-weight:800">Log food →</span><span class="btn" style="color:var(--fg);text-transform:uppercase;letter-spacing:.08em;text-decoration:underline;text-decoration-color:var(--accent);text-underline-offset:4px">Add set</span></div>`]
+    ] },
+  { id: "macro", t: "Macro display", d: "How protein, carbs, and fat progress is shown.",
+    o: [
+      ["Bars", "one row per macro", `<div class="tile" style="align-content:center">${macros.map((m, i) => `<div class="mrow"><span>${m[0]}</span><div class="bar"><i style="width:${m[1] * 100}%;background:${mcolors[i]}"></i></div><b>${m[2]}</b></div>`).join("")}</div>`],
+      ["Rings", "nested circles", `<div class="tile" style="grid-template-columns:96px 1fr;align-items:center"><svg viewBox="0 0 100 100" width="96" height="96">${ring(.78, mcolors[0], 42) + ring(.64, mcolors[1], 31) + ring(.81, mcolors[2], 20)}</svg><div style="display:grid;gap:4px;font-size:12px">${macros.map((m, i) => `<span><b style="color:${mcolors[i]}">●</b> ${m[0]} ${m[2]}</span>`).join("")}</div></div>`],
+      ["Three dials", "side by side", `<div class="tile" style="grid-template-columns:repeat(3,1fr);align-items:center;text-align:center">${macros.map((m, i) => `<div><svg viewBox="0 0 100 100" width="100%" style="max-width:70px">${ring(m[1], mcolors[i], 40)}<text x="50" y="56" text-anchor="middle" font-size="20" font-weight="700">${Math.round(m[1] * 100)}%</text></svg><div class="sm">${m[0]} ${m[2].split("/")[0]}</div></div>`).join("")}</div>`],
+      ["Big numbers", "just the grams, no graphics", `<div class="tile" style="grid-template-columns:repeat(3,1fr);align-items:end">${macros.map(m => `<div><div class="lbl">${m[0] === "P" ? "Protein" : m[0] === "C" ? "Carbs" : "Fat"}</div><div style="font-size:26px;font-weight:800;font-variant-numeric:tabular-nums">${m[2].split("/")[0]}</div><div class="sm">of ${m[2].split("/")[1]}</div></div>`).join("")}</div>`]
+    ] },
+  { id: "density", t: "Density", d: "How tightly lists are packed.",
+    o: [
+      ["Compact", "more on screen", `<div class="tile" style="gap:0;padding:8px 12px">${["Bench press|185 lb", "Overhead press|95 lb", "Incline DB|55 lb", "Dips|BW + 25", "Cable fly|30 lb"].map(r => `<div class="row" style="padding:5px 0;font-size:12px"><span>${r.split("|")[0]}</span><em>${r.split("|")[1]}</em></div>`).join("")}</div>`],
+      ["Comfortable", "more breathing room", `<div class="tile" style="gap:0;padding:16px 18px">${["Bench press|185 lb", "Overhead press|95 lb", "Incline DB|55 lb"].map(r => `<div class="row" style="padding:12px 0;font-size:14px"><span>${r.split("|")[0]}</span><em>${r.split("|")[1]}</em></div>`).join("")}</div>`]
+    ] },
+  { id: "orange", t: "Orange shade", d: "The exact accent color.",
+    o: [["Blaze", "#ff5a1f (round 1)", tile()], ["Amber", "#ff8a00", tile("--accent:#ff8a00")], ["Red-orange", "#ff3b1f", tile("--accent:#ff3b1f")], ["Soft coral", "#ff7a59", tile("--accent:#ff7a59")]].map(o => [o[0], o[1], o[2].replace('class="tile" style="', `class="tile" style="--accent:${o[1].slice(0, 7)};`)])
+  },
+  { id: "black", t: "Background", d: "How dark the base is.",
+    o: [["True black", "#000000", "#000", "#121212"], ["Charcoal", "#141518 (round 1)", "#141518", "#1c1e22"], ["Warm charcoal", "#17140f", "#17140f", "#211d17"], ["Slate", "#0f1419", "#0f1419", "#18202a"]]
+      .map(([n, c, bg, card]) => [n, c, `<div style="background:${bg};padding:12px;border-radius:10px">${tile("background:" + card)}</div>`])
+  }
+];
+
+const pick = {}; let saved = {};
+try { saved = JSON.parse(localStorage.getItem("r2") || "{}"); } catch (e) {}
+const qs = document.getElementById("qs");
+Q.forEach((q, qi) => {
+  pick[q.id] = saved[q.id] || { v: "", n: "" };
+  const s = document.createElement("section"); s.className = "q";
+  s.innerHTML = `<div class="qhead"><h2><span>${String(qi + 1).padStart(2, "0")}</span>${q.t}</h2><p>${q.d}</p></div>
+    <div class="opts">${q.o.map(([name, sub, html]) => `<button type="button" class="opt" data-v="${name}" aria-pressed="${pick[q.id].v === name}">${html}<span class="cap"><b>${name}</b><span>${sub}</span></span></button>`).join("")}</div>
+    <input class="note" id="note-${q.id}" placeholder="Notes on ${q.t.toLowerCase()} (optional)">`;
+  s.querySelector(".note").value = pick[q.id].n;
+  s.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    pick[q.id].v = pick[q.id].v === b.dataset.v ? "" : b.dataset.v;
+    s.querySelectorAll(".opt").forEach(x => x.setAttribute("aria-pressed", x.dataset.v === pick[q.id].v)); sync();
+  });
+  s.querySelector(".note").oninput = e => { pick[q.id].n = e.target.value; sync(); };
+  qs.appendChild(s);
+});
+function sync() {
+  document.getElementById("count").textContent = `${Q.filter(q => pick[q.id].v).length} of ${Q.length} chosen`;
+  try { localStorage.setItem("r2", JSON.stringify(pick)); } catch (e) {}
+}
+sync();
+document.getElementById("copy").onclick = () => {
+  const text = "Round 2 picks:\n" + Q.map(q => `- ${q.t}: ${pick[q.id].v || "no pick"}${pick[q.id].n ? " (" + pick[q.id].n + ")" : ""}`).join("\n");
+  const out = document.getElementById("out"), btn = document.getElementById("copy");
+  out.value = text; out.hidden = false;
+  try { navigator.clipboard.writeText(text).then(() => { btn.textContent = "Copied"; setTimeout(() => btn.textContent = "Copy my picks", 1500); }, () => out.select()); } catch (e) { out.select(); }
+};
+</script>
