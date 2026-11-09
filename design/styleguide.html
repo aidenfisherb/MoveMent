@@ -1,0 +1,366 @@
+<title>Personal UI Style Guide</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Manrope:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: the style guide rendered in its own system; single dark look by design. Sections stack; components sit in outlined cards on a responsive grid. */
+:root {
+  --bg:#000000; --surface:#0E0F11; --surface-2:#17181B;
+  --line:#2A2C31; --line-strong:#3A3D44;
+  --fg:#F2F2F2; --muted:#8B8E96; --faint:#5A5D64;
+  --accent:#FF5A1F; --accent-hover:#FF7340; --accent-dim:rgba(255,90,31,.14); --on-accent:#000000;
+  --success:#3DDC84; --warning:#FFC233; --danger:#FF4D6A;
+  --series-1:#FF5A1F; --series-2:#F2F2F2; --series-3:#6C7080; --grid:#1A1B1E;
+  --font-text:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-num:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  --r-card:10px; --r-input:8px; --r-pill:9999px;
+  color-scheme: dark;
+}
+body { background:var(--bg); color:var(--fg); font:400 14px/1.5 var(--font-text); -webkit-font-smoothing:antialiased; }
+.page { max-width:1120px; margin:0 auto; padding-block:32px 64px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); display:grid; gap:40px; }
+h1 { font-weight:800; font-size:28px; line-height:1.2; letter-spacing:-.01em; margin:0; text-wrap:balance; }
+h2 { font-weight:800; font-size:17px; line-height:1.3; margin:0; }
+h3 { font-weight:600; font-size:15px; margin:0; }
+p { margin:0; }
+.lead { color:var(--muted); max-width:65ch; }
+.num { font-family:var(--font-num); font-variant-numeric:tabular-nums; }
+.label { font:600 11px/1.2 var(--font-text); text-transform:uppercase; letter-spacing:.08em; color:var(--muted); }
+.muted { color:var(--muted); } .small { font-size:12px; }
+section { display:grid; gap:14px; }
+.sechead { display:flex; align-items:baseline; gap:12px; border-bottom:1px solid var(--line); padding-bottom:8px; }
+.grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap:12px; }
+.card { background:var(--bg); border:1px solid var(--line); border-radius:var(--r-card); padding:12px; display:grid; gap:10px; align-content:start; min-width:0; }
+.card-head { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+
+/* swatches */
+.swatches { display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%, 150px), 1fr)); gap:12px; }
+.sw { border:1px solid var(--line); border-radius:var(--r-card); overflow:hidden; }
+.sw i { display:block; height:56px; border-bottom:1px solid var(--line); }
+.sw div { padding:8px 10px; display:grid; gap:2px; }
+.sw b { font-weight:600; font-size:13px; }
+.sw span { font:12px var(--font-num); color:var(--muted); }
+
+/* type */
+.type-row { display:grid; grid-template-columns:150px 1fr; gap:12px; align-items:baseline; padding:10px 0; border-top:1px solid var(--line); }
+.type-row:first-child { border-top:0; }
+.type-row > span:first-child { font:12px var(--font-num); color:var(--muted); }
+@media (max-width:520px) { .type-row { grid-template-columns:1fr; gap:4px; } }
+
+/* buttons */
+.btn { height:40px; padding:0 18px; border-radius:var(--r-pill); font:700 14px var(--font-text); border:1px solid var(--line); background:transparent; color:var(--fg); cursor:pointer; display:inline-flex; align-items:center; gap:8px; transition:background .15s ease-out,border-color .15s ease-out,color .15s ease-out; }
+.btn:hover { border-color:var(--line-strong); background:var(--surface); }
+.btn-primary { background:var(--accent); border-color:var(--accent); color:var(--on-accent); }
+.btn-primary:hover { background:var(--accent-hover); border-color:var(--accent-hover); }
+.btn-ghost { border-color:transparent; color:var(--muted); }
+.btn-ghost:hover { color:var(--fg); background:transparent; border-color:transparent; }
+.btn-danger { border-color:var(--danger); color:var(--danger); }
+.btn[disabled] { opacity:.4; cursor:not-allowed; }
+.icon-btn { width:36px; height:36px; padding:0; justify-content:center; }
+.btn-full { width:100%; justify-content:center; }
+:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+.wrap-row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+svg.ic { width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:1.75; stroke-linecap:round; stroke-linejoin:round; flex:none; }
+
+/* inputs */
+.field { display:grid; gap:6px; }
+.input { height:40px; padding:0 12px; background:var(--surface); border:1px solid var(--line); border-radius:var(--r-input); color:var(--fg); font:400 14px var(--font-text); width:100%; box-sizing:border-box; }
+.input::placeholder { color:var(--muted); }
+.input:hover { border-color:var(--line-strong); }
+.input:focus { border-color:var(--accent); outline:none; box-shadow:0 0 0 2px var(--bg), 0 0 0 4px var(--accent); }
+.input.num { font-family:var(--font-num); }
+.input.err { border-color:var(--danger); }
+.help-err { color:var(--danger); font-size:12px; }
+.two { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+/* chips, segmented, toggle */
+.chip { height:28px; padding:0 12px; border-radius:var(--r-pill); border:1px solid var(--line); background:transparent; color:var(--fg); font:600 12px var(--font-text); cursor:pointer; }
+.chip[aria-pressed="true"] { background:var(--accent-dim); border-color:var(--accent); color:var(--accent); }
+.seg { display:inline-flex; border:1px solid var(--line); border-radius:var(--r-pill); padding:3px; gap:2px; }
+.seg button { height:30px; padding:0 14px; border:0; border-radius:var(--r-pill); background:transparent; color:var(--muted); font:600 13px var(--font-text); cursor:pointer; }
+.seg button[aria-pressed="true"] { background:var(--accent); color:var(--on-accent); }
+.toggle { width:36px; height:20px; border-radius:var(--r-pill); background:var(--line); border:0; position:relative; cursor:pointer; padding:0; transition:background .15s ease-out; }
+.toggle::after { content:""; position:absolute; top:3px; left:3px; width:14px; height:14px; border-radius:50%; background:var(--fg); transition:transform .15s ease-out; }
+.toggle[aria-checked="true"] { background:var(--accent); }
+.toggle[aria-checked="true"]::after { transform:translateX(16px); }
+.tag { display:inline-block; padding:2px 8px; border-radius:6px; font:600 11px var(--font-text); border:1px solid var(--line); color:var(--muted); }
+.tag.ok { color:var(--success); border-color:rgba(61,220,132,.4); }
+.tag.warn { color:var(--warning); border-color:rgba(255,194,51,.4); }
+.tag.bad { color:var(--danger); border-color:rgba(255,77,106,.4); }
+
+/* rows */
+.rows { display:grid; }
+.row { display:grid; grid-template-columns:1fr auto; align-items:center; min-height:36px; padding:6px 4px; border-top:1px solid var(--line); gap:0 8px; }
+.row:first-child { border-top:0; }
+.row:hover { background:var(--surface); }
+.row.sel { background:var(--accent-dim); }
+.row .name { font-size:14px; }
+.row .sub { font-size:12px; color:var(--muted); grid-column:1; }
+.row .val { font:13px var(--font-num); grid-column:2; grid-row:1 / span 2; }
+.unit { color:var(--muted); font-size:.85em; }
+
+/* dials */
+.dials { display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; text-align:center; }
+.dial { display:grid; gap:4px; justify-items:center; }
+.dial svg { width:100%; max-width:80px; height:auto; }
+.dial circle.prog { transition:stroke-dasharray .25s ease-out; }
+.dial text { font-family:var(--font-num); font-weight:600; font-size:20px; fill:var(--fg); }
+.dial .v { font:12px var(--font-num); color:var(--muted); }
+
+/* stat tiles */
+.display { font:600 40px/1 var(--font-num); color:var(--accent); font-variant-numeric:tabular-nums; }
+.stat { font:600 20px/1.1 var(--font-num); font-variant-numeric:tabular-nums; }
+.up { color:var(--success); } .down { color:var(--danger); }
+
+/* table */
+.tablewrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th { text-align:left; font:600 11px var(--font-text); text-transform:uppercase; letter-spacing:.08em; color:var(--muted); padding:8px; border-bottom:1px solid var(--line); }
+td { padding:8px; border-top:1px solid var(--line); height:20px; }
+tbody tr:first-child td { border-top:0; }
+td.n, th.n { text-align:right; font-family:var(--font-num); font-variant-numeric:tabular-nums; }
+
+/* chart */
+.chart svg { width:100%; height:auto; display:block; }
+.chart text { font-family:var(--font-num); font-size:10px; fill:var(--muted); }
+
+/* toast, sheet, nav, empty */
+.toast { display:inline-flex; align-items:center; gap:8px; padding:8px 16px; border-radius:var(--r-pill); background:var(--surface-2); border:1px solid var(--line); font-size:13px; }
+.dot { width:8px; height:8px; border-radius:50%; background:var(--success); }
+.sheet { border:1px solid var(--line); border-radius:16px 16px 0 0; padding:12px 12px 16px; display:grid; gap:12px; background:var(--bg); }
+.grabber { width:36px; height:4px; border-radius:99px; background:var(--line); justify-self:center; }
+.empty { display:grid; justify-items:center; text-align:center; gap:6px; padding:20px 8px; }
+.empty svg.ic { width:32px; height:32px; color:var(--faint); }
+.tabbar { display:grid; grid-template-columns:repeat(4, 1fr); border-top:1px solid var(--line); height:56px; align-items:center; margin:0 -12px -12px; }
+.tabbar button { background:none; border:0; color:var(--muted); display:grid; justify-items:center; gap:2px; font:600 11px var(--font-text); cursor:pointer; padding:4px 0; }
+.tabbar button svg.ic { width:22px; height:22px; }
+.tabbar button[aria-current="page"] { color:var(--accent); }
+.topnav { display:flex; align-items:center; gap:20px; border:1px solid var(--line); border-radius:var(--r-card); padding:0 12px; height:56px; flex-wrap:wrap; }
+.topnav .brand { font-weight:800; }
+.topnav a { color:var(--muted); text-decoration:none; font-weight:600; font-size:14px; }
+.topnav a[aria-current="page"] { color:var(--fg); text-decoration:underline; text-decoration-color:var(--accent); text-decoration-thickness:2px; text-underline-offset:6px; }
+.topnav .spacer { flex:1; }
+@media (max-width:560px) { .topnav a:not([aria-current]) { display:none; } }
+
+.dodont { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap:12px; }
+.dodont ul { margin:0; padding-left:18px; display:grid; gap:4px; }
+@media (prefers-reduced-motion: reduce) { * { transition:none !important; } }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 6a1 1 0 0 1 1-1h5l2 2h9a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8zM14 3v5h5M9 13h6M9 17h6"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18M7 15l4-4 3 3 6-6"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></symbol>
+</svg>
+
+<main class="page">
+  <header style="display:grid;gap:8px">
+    <span class="label">Personal design system · v1</span>
+    <h1>Personal UI Style Guide</h1>
+    <p class="lead">True black, one Blaze orange accent, Manrope for words and JetBrains Mono for numbers. Outlined cards, pill buttons, compact rows, and dials for anything with a target. Use it for any app or site. The example content is placeholder. This page is built entirely from the tokens in <span class="num" style="color:var(--fg)">SKILL.md</span>.</p>
+  </header>
+
+  <section>
+    <div class="sechead"><h2>Color</h2><span class="muted small">One accent. Status colors only for status.</span></div>
+    <div class="swatches" id="swatches"></div>
+  </section>
+
+  <section>
+    <div class="sechead"><h2>Type</h2><span class="muted small">Manrope 400 / 600 / 800 · JetBrains Mono 400 / 600</span></div>
+    <div class="card">
+      <div class="type-row"><span>Display · Mono 40/600</span><span class="display">642</span></div>
+      <div class="type-row"><span>H1 · 24/800</span><span style="font-weight:800;font-size:24px;letter-spacing:-.01em">Overview</span></div>
+      <div class="type-row"><span>H2 · 17/800</span><span style="font-weight:800;font-size:17px">Recent activity</span></div>
+      <div class="type-row"><span>H3 · 15/600</span><span style="font-weight:600;font-size:15px">Details</span></div>
+      <div class="type-row"><span>Body · 14/400</span><span>Changes save automatically and sync the next time you open the app.</span></div>
+      <div class="type-row"><span>Caption · 12/400</span><span class="small muted">Last updated 7:42 pm</span></div>
+      <div class="type-row"><span>Label · 11/600 caps</span><span class="label">Balance</span></div>
+      <div class="type-row"><span>Data · Mono 13/400</span><span class="num">1,284 items · 48.2 <span class="unit">GB</span></span></div>
+      <div class="type-row"><span>Data emphasis · Mono 20/600</span><span class="stat">$1,250</span></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sechead"><h2>Controls</h2><span class="muted small">Pill shapes. Black text on orange. One primary per view.</span></div>
+    <div class="grid">
+      <div class="card">
+        <span class="label">Buttons</span>
+        <div class="wrap-row">
+          <button class="btn btn-primary" type="button">Save changes</button>
+          <button class="btn" type="button">Add item</button>
+          <button class="btn btn-ghost" type="button">Cancel</button>
+        </div>
+        <div class="wrap-row">
+          <button class="btn btn-danger" type="button"><svg class="ic"><use href="#i-trash"/></svg>Delete</button>
+          <button class="btn" type="button" disabled>Disabled</button>
+          <button class="btn icon-btn" type="button" aria-label="Add"><svg class="ic"><use href="#i-plus"/></svg></button>
+          <button class="btn icon-btn" type="button" aria-label="More"><svg class="ic"><use href="#i-more"/></svg></button>
+        </div>
+        <button class="btn btn-primary btn-full" type="button">Create project</button>
+      </div>
+      <div class="card">
+        <span class="label">Inputs</span>
+        <div class="field"><label class="label" for="name">Name</label><input class="input" id="name" placeholder="Search items"></div>
+        <div class="two">
+          <div class="field"><label class="label" for="wt">Amount ($)</label><input class="input num" id="wt" inputmode="decimal" value="1,250.00"></div>
+          <div class="field"><label class="label" for="qty">Quantity</label><input class="input num err" id="qty" inputmode="decimal" value="0"><span class="help-err">Enter a quantity of 1 or more.</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <span class="label">Chips, segments, toggles, tags</span>
+        <div class="wrap-row" id="chips">
+          <button class="chip" type="button" aria-pressed="true">All</button>
+          <button class="chip" type="button" aria-pressed="false">Active</button>
+          <button class="chip" type="button" aria-pressed="false">Archived</button>
+          <button class="chip" type="button" aria-pressed="false">Shared</button>
+        </div>
+        <div class="seg" id="seg"><button type="button" aria-pressed="false">Day</button><button type="button" aria-pressed="true">Week</button><button type="button" aria-pressed="false">Month</button></div>
+        <div class="wrap-row" style="justify-content:space-between"><label for="tg">Email notifications</label><button class="toggle" id="tg" role="switch" aria-checked="true" type="button"></button></div>
+        <div class="wrap-row"><span class="tag">Draft</span><span class="tag ok">Done</span><span class="tag warn">Due soon</span><span class="tag bad">Overdue</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sechead"><h2>Cards and data</h2><span class="muted small">Outlined on black. Dials are the signature element for anything with a target.</span></div>
+    <div class="grid">
+      <div class="card">
+        <div class="card-head"><h2>This month</h2><span class="small muted num">Nov 2026</span></div>
+        <span class="label">Budget left</span>
+        <div style="display:flex;align-items:baseline;gap:8px"><span class="display">$642</span><span class="small muted num">of $2,400</span></div>
+        <div class="dials" id="dials"></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>Files</h2><button class="btn icon-btn" type="button" aria-label="Add file"><svg class="ic"><use href="#i-plus"/></svg></button></div>
+        <div class="rows">
+          <div class="row"><span class="name">Quarterly report</span><span class="sub">PDF · edited 2h ago</span><span class="val">2.4 <span class="unit">MB</span></span></div>
+          <div class="row sel"><span class="name">Design assets</span><span class="sub">Folder · 128 items · selected</span><span class="val">1.1 <span class="unit">GB</span></span></div>
+          <div class="row"><span class="name">Meeting notes</span><span class="sub">Doc · edited yesterday</span><span class="val">84 <span class="unit">KB</span></span></div>
+          <div class="row"><span class="name">Invoices 2026</span><span class="sub">Sheet · edited Nov 2</span><span class="val">312 <span class="unit">KB</span></span></div>
+          <div class="row"><span class="name">Product photos</span><span class="sub">Folder · 46 items</span><span class="val">640 <span class="unit">MB</span></span></div>
+        </div>
+      </div>
+      <div class="card" style="grid-template-columns:1fr 1fr;gap:12px">
+        <div style="display:grid;gap:4px"><span class="label">Revenue</span><span class="stat">$12.4<span class="unit">k</span></span><span class="small muted"><span class="up num">+8%</span> vs last month</span></div>
+        <div style="display:grid;gap:4px"><span class="label">Response time</span><span class="stat">240 <span class="unit">ms</span></span><span class="small muted"><span class="down num">+18 ms</span> vs last week</span></div>
+        <div style="display:grid;gap:4px"><span class="label">Tasks done</span><span class="stat">24<span class="unit">/38</span></span><span class="small muted">this sprint</span></div>
+        <div style="display:grid;gap:4px"><span class="label">Uptime</span><span class="stat">99.9<span class="unit">%</span></span><span class="small muted">last 30 days</span></div>
+      </div>
+      <div class="card chart">
+        <div class="card-head"><h2>Monthly revenue</h2><div class="seg"><button type="button" aria-pressed="false">6M</button><button type="button" aria-pressed="true">12M</button></div></div>
+        <svg viewBox="0 0 320 150" role="img" aria-label="Monthly revenue rising from $7.8k to $12.4k over 12 months" id="chart"></svg>
+      </div>
+      <div class="card">
+        <h2>Recent invoices</h2>
+        <div class="tablewrap"><table>
+          <thead><tr><th>Client</th><th>Date</th><th class="n">Items</th><th class="n">Amount</th></tr></thead>
+          <tbody>
+            <tr><td>Northwind</td><td>Nov 9</td><td class="n">4</td><td class="n">$1,250.00</td></tr>
+            <tr><td>Harbor Labs</td><td>Nov 5</td><td class="n">2</td><td class="n">$480.00</td></tr>
+            <tr><td>Fieldstone</td><td>Nov 2</td><td class="n">7</td><td class="n">$3,120.50</td></tr>
+            <tr><td>Kite &amp; Co</td><td>Oct 29</td><td class="n">1</td><td class="n">$95.00</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+      <div class="card">
+        <h2>Notes</h2>
+        <div class="empty">
+          <svg class="ic"><use href="#i-doc"/></svg>
+          <p>Notes you create show up here.</p>
+          <p class="small muted">Start one now, or import from a file.</p>
+          <button class="btn" type="button"><svg class="ic"><use href="#i-plus"/></svg>New note</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sechead"><h2>Navigation and overlays</h2></div>
+    <nav class="topnav" aria-label="Example top navigation"><span class="brand">Appname</span><a href="#" aria-current="page">Overview</a><a href="#">Projects</a><a href="#">Reports</a><a href="#">Settings</a><span class="spacer"></span><button class="btn btn-primary" type="button">New project</button></nav>
+    <div class="grid">
+      <div class="card">
+        <span class="label">Mobile tab bar</span>
+        <p class="small muted">Fixed to the bottom of the screen in the app.</p>
+        <div class="tabbar">
+          <button type="button" aria-current="page"><svg class="ic"><use href="#i-home"/></svg>Home</button>
+          <button type="button"><svg class="ic"><use href="#i-folder"/></svg>Files</button>
+          <button type="button"><svg class="ic"><use href="#i-chart"/></svg>Reports</button>
+          <button type="button"><svg class="ic"><use href="#i-gear"/></svg>Settings</button>
+        </div>
+      </div>
+      <div class="card" style="background:rgba(0,0,0,.7)">
+        <span class="label">Bottom sheet</span>
+        <div class="sheet">
+          <div class="grabber"></div>
+          <h2>Add item</h2>
+          <div class="two">
+            <div class="field"><label class="label" for="sw">Name</label><input class="input" id="sw" value="Desk lamp"></div>
+            <div class="field"><label class="label" for="sr">Quantity</label><input class="input num" id="sr" value="2"></div>
+          </div>
+          <button class="btn btn-primary btn-full" type="button">Add item</button>
+        </div>
+      </div>
+      <div class="card" style="align-content:center;justify-items:center;gap:12px">
+        <span class="label" style="justify-self:start">Toast</span>
+        <span class="toast"><span class="dot"></span>Changes saved</span>
+        <span class="toast">Item deleted · <button class="btn-ghost btn" style="height:auto;padding:0;color:var(--accent)" type="button">Undo</button></span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sechead"><h2>Do and don't</h2></div>
+    <div class="dodont">
+      <div class="card"><span class="label" style="color:var(--success)">Do</span><ul>
+        <li>True black page, thin gray outlines</li><li>One orange focal point per screen</li><li>Monospace for every number, with units</li><li>Dials for anything with a target</li><li>Compact rows, pill buttons, black text on orange</li></ul></div>
+      <div class="card"><span class="label" style="color:var(--danger)">Don't</span><ul>
+        <li>Filled gray cards, shadows, gradients, blur</li><li>A second accent color</li><li>White text on orange</li><li>Condensed, all-caps, or serif headings</li><li>Emoji as icons, big empty hero sections</li></ul></div>
+    </div>
+  </section>
+</main>
+
+<script>
+const sw = [
+  ["bg","#000000","Page and cards"],["surface","#0E0F11","Inputs, hover"],["surface-2","#17181B","Toasts, tooltips"],
+  ["line","#2A2C31","Borders, tracks"],["line-strong","#3A3D44","Hover borders"],["fg","#F2F2F2","Primary text"],
+  ["muted","#8B8E96","Secondary text"],["faint","#5A5D64","Disabled"],["accent","#FF5A1F","Blaze orange"],
+  ["accent-hover","#FF7340","Accent hover"],["success","#3DDC84","Goal hit, PR"],["warning","#FFC233","Near limit"],["danger","#FF4D6A","Over, delete"],
+  ["series-3","#6C7080","Fat / 3rd series"]
+];
+document.getElementById("swatches").innerHTML = sw.map(([n, h, u]) => `<div class="sw"><i style="background:${h}"></i><div><b>--${n}</b><span>${h}</span><span style="font-family:var(--font-text)">${u}</span></div></div>`).join("");
+
+const C = 2 * Math.PI * 40;
+const series = [["Spent", 1758, 2400, "var(--series-1)", "$", ""], ["Tasks", 24, 38, "var(--series-2)", "", ""], ["Storage", 78, 100, "var(--series-3)", "", " GB"]];
+const dials = document.getElementById("dials");
+dials.innerHTML = series.map(([n, v, t, c, pre, suf]) => {
+  const p = Math.min(v / t, 1);
+  return `<div class="dial"><svg viewBox="0 0 100 100" role="img" aria-label="${n} ${Math.round(p * 100)}%">
+    <circle cx="50" cy="50" r="40" fill="none" stroke="var(--line)" stroke-width="8"/>
+    <circle class="prog" cx="50" cy="50" r="40" fill="none" stroke="${c}" stroke-width="8" stroke-linecap="round" stroke-dasharray="${C * p} ${C}" transform="rotate(-90 50 50)"/>
+    <text x="50" y="57" text-anchor="middle">${Math.round(p * 100)}%</text></svg>
+    <span class="label">${n}</span><span class="v">${pre}${v.toLocaleString()} / ${pre}${t.toLocaleString()}${suf}</span></div>`;
+}).join("");
+
+// line chart
+const data = [7.8, 8.1, 7.9, 8.6, 9.0, 8.8, 9.6, 10.1, 10.4, 11.0, 11.6, 12.4];
+const W = 320, H = 150, L = 34, R = 40, T = 12, B = 22, lo = 7, hi = 13;
+const x = i => L + i * (W - L - R) / (data.length - 1), y = v => T + (hi - v) * (H - T - B) / (hi - lo);
+let s = "";
+[7, 9, 11, 13].forEach(v => s += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--grid)"/><text x="${L - 6}" y="${y(v) + 3}" text-anchor="end">$${v}k</text>`);
+[0, 4, 8, 11].forEach(i => s += `<text x="${x(i)}" y="${H - 6}" text-anchor="middle">${["Dec","Apr","Aug","Nov"][[0,4,8,11].indexOf(i)]}</text>`);
+s += `<polyline fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="${data.map((v, i) => x(i) + "," + y(v)).join(" ")}"/>`;
+const li = data.length - 1;
+s += `<circle cx="${x(li)}" cy="${y(data[li])}" r="4" fill="var(--accent)"/><text x="${x(li) + 7}" y="${y(data[li]) + 4}" style="fill:var(--fg);font-weight:600">$${data[li]}k</text>`;
+document.getElementById("chart").innerHTML = s;
+
+// interactivity for the demo controls
+document.querySelectorAll("#chips .chip").forEach(b => b.onclick = () => b.setAttribute("aria-pressed", b.getAttribute("aria-pressed") !== "true"));
+document.querySelectorAll(".seg").forEach(g => g.querySelectorAll("button").forEach(b => b.onclick = () => g.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b))));
+document.getElementById("tg").onclick = e => e.currentTarget.setAttribute("aria-checked", e.currentTarget.getAttribute("aria-checked") !== "true");
+document.querySelectorAll(".tabbar button").forEach(b => b.onclick = () => document.querySelectorAll(".tabbar button").forEach(x => x === b ? x.setAttribute("aria-current", "page") : x.removeAttribute("aria-current")));
+document.querySelectorAll('a[href="#"]').forEach(a => a.onclick = e => e.preventDefault());
+</script>
