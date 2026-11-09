@@ -1,21 +1,21 @@
 ---
 name: personal-ui-style
-description: Aiden's personal visual style for any website, web app, dashboard, or UI component (true-black background, "Blaze" orange accent, Manrope + JetBrains Mono, outlined cards, pill buttons, compact lists, dial charts). Use whenever building or restyling any interface for Aiden unless the request asks for a different look.
+description: Aiden's personal visual style for any website, web app, dashboard, or UI component (true-black background, "Blaze" orange accent, Manrope + JetBrains Mono, outlined cards, pill buttons, compact lists, dial charts). Use whenever building or restyling any interface for Aiden, in any project, unless the request asks for a different look.
 ---
 
 # Personal UI Style Guide
 
-This file defines the visual style for every interface built for me. Follow it exactly unless my request explicitly says otherwise. If something you need isn't covered here, extend the system in the same spirit (dark, sharp contrast, one orange accent, quiet everywhere else) rather than inventing a new look.
+This file defines the visual style for every interface built for me. Follow it exactly unless my request explicitly says otherwise. This is a general system for every project, not tied to any one app. If something you need isn't covered here, extend the system in the same spirit (dark, sharp contrast, one orange accent, quiet everywhere else) rather than inventing a new look.
 
 ## 1. Personality in one paragraph
 
-Dark, focused, athletic, and data-forward. A true-black canvas with thin gray outlines, white text, and a single hot orange accent used sparingly for the one thing that matters on screen (the primary action, the key number, the active state). Clean rounded sans-serif for words, monospace for numbers. Compact and information-dense, like a training log, never cluttered. No gradients, no shadows, no decoration.
+Dark, focused, confident, and data-forward. A true-black canvas with thin gray outlines, white text, and a single hot orange accent used sparingly for the one thing that matters on screen (the primary action, the key number, the active state). Clean rounded sans-serif for words, monospace for numbers. Compact and information-dense, like a well-made instrument panel, never cluttered. No gradients, no shadows, no decoration.
 
 ## 2. Hard rules
 
 1. **Dark mode only.** Background is true black `#000000`. Do not build a light theme unless asked.
 2. **One accent color: Blaze orange `#FF5A1F`.** Never introduce a second brand color (no blues, purples, teals). Use orange for at most 1 to 3 elements per screen.
-3. **Fonts: Manrope for all text, JetBrains Mono for all numbers and measurements** (weights, reps, calories, grams, times, dates in tables).
+3. **Fonts: Manrope for all text, JetBrains Mono for all numbers and measurements** (prices, counts, sizes, measurements, times, dates in tables).
 4. **Cards are outlined, not filled.** Card background equals page background (`#000`); separation comes from a 1px `#2A2C31` border.
 5. **Corners: 10px on cards, 8px on inputs, fully round (pill) on buttons and chips.**
 6. **No box shadows, no gradients, no glassmorphism/blur, no emoji as icons.**
@@ -47,7 +47,7 @@ Dark, focused, athletic, and data-forward. A true-black canvas with thin gray ou
 | `--warning` | `#FFC233` | Approaching limit |
 | `--danger` | `#FF4D6A` | Over limit, delete, errors |
 
-**Data series colors** (charts with more than one series, e.g. macros): series 1 `#FF5A1F` (orange), series 2 `#F2F2F2` (white), series 3 `#6C7080` (gray). Add `#FFC9B3` (pale orange) as a 4th only if unavoidable. Default mapping for nutrition: **Protein = orange, Carbs = white, Fat = gray.**
+**Data series colors** (charts or dials with more than one series): series 1 `#FF5A1F` (orange), series 2 `#F2F2F2` (white), series 3 `#6C7080` (gray). Add `#FFC9B3` (pale orange) as a 4th only if unavoidable. The most important series always gets orange. Each project decides its own mapping (e.g. a nutrition app might use protein = orange, carbs = white, fat = gray) and documents it in that project, not here.
 
 ## 4. Typography
 
@@ -66,17 +66,17 @@ Type scale (px, mobile first; desktop may bump display and h1 by ~20%):
 
 | Role | Font | Size / line-height | Weight | Notes |
 |---|---|---|---|---|
-| Display number | JetBrains Mono | 40 / 1.0 | 600 | The single hero number on a screen (e.g. calories left). Colored `--accent`. |
+| Display number | JetBrains Mono | 40 / 1.0 | 600 | The single hero number on a screen (e.g. a balance, a total, a score). Colored `--accent`. |
 | H1 page title | Manrope | 24 / 1.2 | 800 | One per screen. Letter-spacing -0.01em. |
 | H2 section / card title | Manrope | 17 / 1.3 | 800 | |
 | H3 subsection | Manrope | 15 / 1.3 | 600 | |
 | Body | Manrope | 14 / 1.5 | 400 | Default text size. |
 | Small / caption | Manrope | 12 / 1.4 | 400 | `--muted` color. |
 | Label (eyebrow) | Manrope | 11 / 1.2 | 600 | UPPERCASE, letter-spacing 0.08em, `--muted`. Used above values and as section headers inside cards. |
-| Data value | JetBrains Mono | 13 / 1.4 | 400 | Weights, reps, grams in lists and tables. |
+| Data value | JetBrains Mono | 13 / 1.4 | 400 | Counts, amounts, sizes in lists and tables. |
 | Data value, emphasis | JetBrains Mono | 20 / 1.1 | 600 | Stat tiles, dial centers. |
 
-Headings use `text-wrap: balance`. Running text is capped near 65 characters wide. Units go after the number in `--muted` at a smaller size when space allows: `185 lb`, `2,400 kcal`.
+Headings use `text-wrap: balance`. Running text is capped near 65 characters wide. Units go after the number in `--muted` at a smaller size when space allows: `48 GB`, `$1,250`, `12 min`.
 
 ## 5. Spacing, sizing, layout
 
@@ -115,7 +115,7 @@ Card header: H2 title on the left, optional muted meta or icon button on the rig
 - Full-width primary button at the bottom of forms on mobile.
 
 ### 7.3 Inputs
-Height 40px, background `--surface`, 1px `--line` border, radius 8px, padding 0 12px, Manrope 14px, text `--fg`, placeholder `--muted`. Focus: border `--accent` plus the focus ring. Numeric inputs (weight, reps, grams) use JetBrains Mono and `inputmode="decimal"`. Label above input as an uppercase Label. Error: border `--danger` and 12px `--danger` helper text below.
+Height 40px, background `--surface`, 1px `--line` border, radius 8px, padding 0 12px, Manrope 14px, text `--fg`, placeholder `--muted`. Focus: border `--accent` plus the focus ring. Numeric inputs (amounts, quantities, measurements) use JetBrains Mono and `inputmode="decimal"`. Label above input as an uppercase Label. Error: border `--danger` and 12px `--danger` helper text below.
 
 ### 7.4 Chips / segmented controls / toggles
 - Chip: pill, 28px tall, padding 0 12px, 1px `--line`, 12px Manrope 600. Selected: background `--accent-dim`, border `--accent`, text `--accent`.
@@ -123,20 +123,20 @@ Height 40px, background `--surface`, 1px `--line` border, radius 8px, padding 0 
 - Toggle switch: pill track 36x20, off `--line`, on `--accent`; knob `--fg`.
 
 ### 7.5 List rows (compact)
-Row height 36-40px, padding 6px 0, divider `border-top: 1px solid var(--line)` between rows (none above the first). Layout: name on the left (Manrope 13-14px `--fg`), optional muted sub-line (12px), value on the right in JetBrains Mono 13px. Example: `Bench press · 3 × 8 ............ 185 lb`. Hover: background `--surface`. Selected: background `--accent-dim`.
+Row height 36-40px, padding 6px 0, divider `border-top: 1px solid var(--line)` between rows (none above the first). Layout: name on the left (Manrope 13-14px `--fg`), optional muted sub-line (12px), value on the right in JetBrains Mono 13px. Example: `Quarterly report · Edited 2h ago ............ 2.4 MB`. Hover: background `--surface`. Selected: background `--accent-dim`.
 
 ### 7.6 Progress dials (signature element)
-Use dials for anything with a target (macros, calories, weekly workouts, steps). Show them in a row of three (or two/four) side by side, each with the percentage in the center and the label + value beneath.
+Use dials for anything with a target or capacity (goals, budgets, quotas, storage, completion). Show them in a row of three (or two/four) side by side, each with the percentage in the center and the label + value beneath.
 
 SVG spec (viewBox `0 0 100 100`, rendered 64-88px wide):
 - Track circle: `cx=50 cy=50 r=40`, `fill="none"`, `stroke=var(--line)`, `stroke-width=8`.
 - Progress circle: same geometry, `stroke` = series color, `stroke-width=8`, `stroke-linecap="round"`, `stroke-dasharray="{C*pct} {C}"` where `C = 2π·40 ≈ 251.3`, `transform="rotate(-90 50 50)"` so it starts at 12 o'clock.
 - Center text: JetBrains Mono 600, ~20 units, `fill=var(--fg)`, e.g. `78%`.
-- Below: Label (`PROTEIN`) and the value `142 / 180 g` in JetBrains Mono 12px `--muted`.
-- Over 100%: clamp the ring at full and color it `--danger` (for limits like calories/fat) or `--success` (for goals like protein).
+- Below: Label (e.g. `STORAGE`) and the value (e.g. `78 / 100 GB`) in JetBrains Mono 12px `--muted`.
+- Over 100%: clamp the ring at full and color it `--danger` when the value is a limit (budget, quota) or `--success` when it is a goal (savings, tasks done).
 
 ```html
-<svg viewBox="0 0 100 100" width="72" height="72" role="img" aria-label="Protein 78%">
+<svg viewBox="0 0 100 100" width="72" height="72" role="img" aria-label="Storage 78%">
   <circle cx="50" cy="50" r="40" fill="none" stroke="#2A2C31" stroke-width="8"/>
   <circle cx="50" cy="50" r="40" fill="none" stroke="#FF5A1F" stroke-width="8" stroke-linecap="round"
           stroke-dasharray="196 251.3" transform="rotate(-90 50 50)"/>
@@ -145,7 +145,7 @@ SVG spec (viewBox `0 0 100 100`, rendered 64-88px wide):
 ```
 
 ### 7.7 Stat tile
-Inside an outlined card: Label on top, value in JetBrains Mono 20px/600 (or the 40px display size for the one hero stat), unit and comparison below in 12px `--muted` (e.g. `+5 lb vs last week` with the delta colored `--success` or `--danger`).
+Inside an outlined card: Label on top, value in JetBrains Mono 20px/600 (or the 40px display size for the one hero stat), unit and comparison below in 12px `--muted` (e.g. `+12% vs last month` with the delta colored `--success` or `--danger`).
 
 ### 7.8 Navigation
 - **Mobile app:** fixed bottom tab bar, 56px tall + safe-area inset, background `--bg`, top border 1px `--line`, 4-5 items, each a 22px outline icon over an 11px label. Active item: icon and label `--accent`. Inactive: `--muted`.
@@ -168,7 +168,7 @@ Centered in the card: a 32px outline icon in `--faint`, one line of `--fg` text 
 Lucide (free, MIT) outline icons, stroke width 1.75, sizes 18px inline / 22px in nav. Color inherits text color. Never filled icons, never emoji.
 
 ## 9. Writing style in the UI
-Short, plain, direct. Sentence case everywhere except Labels (uppercase). Buttons say exactly what they do ("Log food", "Add set", "Save workout"). Numbers always carry units. Errors say what went wrong and how to fix it.
+Short, plain, direct. Sentence case everywhere except Labels (uppercase). Buttons say exactly what they do ("Save changes", "Add item", "Export CSV"), never "Submit" or "OK". Numbers always carry units. Errors say what went wrong and how to fix it.
 
 ## 10. Do / Don't
 
