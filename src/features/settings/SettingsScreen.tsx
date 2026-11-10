@@ -1,17 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 import type { Route } from "../../app/routes";
-import type { Macros } from "../../data/db";
+import { useLiveQuery } from "dexie-react-hooks";
+import { db, type Macros } from "../../data/db";
 import { useSettings } from "../../data/hooks";
 import { saveSetting } from "../../data/settings";
 import { fmt } from "../../lib/format";
 import { ConfirmButton, Icon, NumInput, toast } from "../../ui";
-import { exportBackup, readBackupFile, restoreBackup, type Backup } from "./backup";
+import { exportBackup, hasPhotos, readBackupFile, restoreBackup, type Backup } from "./backup";
 import { switchUnit } from "./units";
 
 export default function SettingsScreen({ go }: { go: (r: Route) => void }) {
   const s = useSettings();
   const [t, setT] = useState<Macros>(s.targets);
   const [key, setKey] = useState(s.usdaKey);
+  const [exportingPhotos, setExportingPhotos] = useState(false);
   const [persisted, setPersisted] = useState<boolean | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const [pendingImport, setPendingImport] = useState<Backup | null>(null);
@@ -24,8 +26,13 @@ export default function SettingsScreen({ go }: { go: (r: Route) => void }) {
 
   const saveTargets = async () => { await saveSetting("targets", t); toast("Targets saved"); };
 
-  const exportData = async () => {
-    if (await exportBackup()) toast("Backup created");
+  const exportData = async (withPhotos: boolean) => {
+    if (withPhotos) setExportingPhotos(true);
+    try {
+      if (await exportBackup(withPhotos)) toast(withPhotos ? "Full backup created" : "Backup created");
+    } finally {
+      setExportingPhotos(false);
+    }
   };
   const readImport = async (f: File) => {
     const data = await readBackupFile(f);
@@ -44,6 +51,7 @@ export default function SettingsScreen({ go }: { go: (r: Route) => void }) {
     toast(`Switched to ${unit}; past entries converted`);
   };
 
+  const photoCount = useLiveQuery(() => db.photos.count(), [], 0);
   const daysSinceBackup = s.lastBackup ? Math.floor((Date.now() - s.lastBackup) / 86400000) : null;
 
   return (
@@ -95,13 +103,21 @@ export default function SettingsScreen({ go }: { go: (r: Route) => void }) {
         <p className="small muted">Your data lives only on this device. Back up regularly and save the file to iCloud Drive or Files. If you delete the app or clear Safari data, only a backup can bring it back.</p>
         {daysSinceBackup === null ? <span className="small warn">You haven't made a backup yet.</span> : <span className={`small ${daysSinceBackup > 7 ? "warn" : "muted"}`}>Last backup {daysSinceBackup === 0 ? "today" : `${daysSinceBackup} day${daysSinceBackup === 1 ? "" : "s"} ago`}.</span>}
         <div className="grid2">
-          <button className="btn btn-primary" type="button" onClick={exportData}><Icon name="download" />Back up</button>
+          <button className="btn btn-primary" type="button" onClick={() => exportData(false)}><Icon name="download" />Back up data</button>
           <button className="btn" type="button" onClick={() => fileRef.current?.click()}><Icon name="upload" />Restore</button>
         </div>
+        {photoCount > 0 && (
+          <div className="spread" style={{ flexWrap: "wrap" }}>
+            <span className="small muted">
+              {photoCount} progress photo{photoCount === 1 ? "" : "s"} · {s.lastPhotoBackup ? `last saved ${new Date(s.lastPhotoBackup).toLocaleDateString(undefined, { month: "short", day: "numeric" })}` : "never backed up"}
+            </span>
+            <button className="btn btn-sm" type="button" disabled={exportingPhotos} onClick={() => exportData(true)}><Icon name="camera" />{exportingPhotos ? "Preparing…" : "Back up with photos"}</button>
+          </div>
+        )}
         <input ref={fileRef} type="file" accept="application/json,.json" hidden onChange={(e) => { const f = e.target.files?.[0]; if (f) readImport(f); e.target.value = ""; }} />
         {pendingImport && (
           <div className="banner warn">
-            <span className="small">Restoring replaces everything on this device with the backup.</span>
+            <span className="small">Restoring replaces everything on this device with the backup{hasPhotos(pendingImport) ? ", including photos" : ". Your photos are kept"}.</span>
             <div className="row-gap">
               <button className="btn btn-ghost btn-sm" type="button" onClick={() => setPendingImport(null)}>Cancel</button>
               <ConfirmButton label="Restore" confirmLabel="Tap to replace" className="btn btn-danger btn-sm" onConfirm={doImport} />

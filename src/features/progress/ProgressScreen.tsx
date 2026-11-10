@@ -7,6 +7,7 @@ import { fmt } from "../../lib/format";
 import { sumMacros } from "../../lib/macros";
 import { e1rm } from "../../lib/strength";
 import { BarChart, Icon, LineChart } from "../../ui";
+import { ProfileCard } from "../body/ProfileCard";
 import { WeighInSheet } from "../body/WeighInSheet";
 
 const short = (key: string) => parseDay(key).toLocaleDateString(undefined, { month: "numeric", day: "numeric" });
@@ -63,6 +64,8 @@ export default function ProgressScreen() {
   return (
     <main className="screen">
       <div className="screen-head"><h1>Progress</h1></div>
+
+      <ProfileCard />
 
       <section className="card">
         <div className="card-head">

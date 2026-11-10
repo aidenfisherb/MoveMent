@@ -144,6 +144,12 @@ erDiagram
     string date
     float weight
   }
+  PHOTOS {
+    int id
+    string date
+    blob image
+    blob thumb
+  }
   SETTINGS {
     string key
     json value
