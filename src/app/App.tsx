@@ -5,12 +5,9 @@ import FoodScreen from "../features/food/FoodScreen";
 import TrainScreen from "../features/training/TrainScreen";
 import ProgressScreen from "../features/progress/ProgressScreen";
 import SettingsScreen from "../features/settings/SettingsScreen";
-import { ROUTES, TABS, type Route } from "./routes";
+import { hashFor, routeFromHash, TABS, type Route } from "./routes";
 
-const readHash = (): Route => {
-  const h = location.hash.slice(1) as Route;
-  return ROUTES.includes(h) ? h : "today";
-};
+const readHash = (): Route => routeFromHash(location.hash.slice(1));
 
 export default function App() {
   const [route, setRoute] = useState<Route>(readHash);
@@ -20,7 +17,7 @@ export default function App() {
     return () => window.removeEventListener("hashchange", on);
   }, []);
   const go = (r: Route) => {
-    if (r !== route) location.hash = r;
+    if (r !== route) location.hash = hashFor(r);
     window.scrollTo(0, 0);
   };
 

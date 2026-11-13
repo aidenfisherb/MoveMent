@@ -6,6 +6,7 @@ import { addDays, dayKey, parseDay } from "../../lib/dates";
 import { fmt } from "../../lib/format";
 import { sumMacros } from "../../lib/macros";
 import { e1rm } from "../../lib/strength";
+import { distUnitFor, formatPace, formatTime, toUnit } from "../../lib/running";
 import { BarChart, Icon, LineChart } from "../../ui";
 import { ProfileCard } from "../body/ProfileCard";
 import { WeighInSheet } from "../body/WeighInSheet";
@@ -99,6 +100,8 @@ export default function ProgressScreen() {
         <span className="small muted">Averages use the {logged.length} day{logged.length === 1 ? "" : "s"} you logged. Dashed line is your target.</span>
       </section>
 
+      <RunningCard />
+
       <section className="card">
         <div className="card-head"><h2>Strength</h2></div>
         {trainedIds.length ? (
@@ -131,5 +134,54 @@ export default function ProgressScreen() {
 
       <WeighInSheet open={weighOpen} onClose={() => setWeighOpen(false)} unit={settings.unit} initial={weights[weights.length - 1]?.weight} />
     </main>
+  );
+}
+
+/** Weekly distance for 12 weeks, recent pace, and bests. Reads runs only (not walks or rides). */
+function RunningCard() {
+  const s = useSettings();
+  const u = distUnitFor(s.unit);
+  const today = dayKey();
+  const monday = addDays(today, -((parseDay(today).getDay() + 6) % 7));
+  const from = addDays(monday, -7 * 11);
+  const recent = useLiveQuery(() => db.activities.where("date").aboveOrEqual(from).filter((a) => a.sport === "run").toArray(), [from], []);
+  const all = useLiveQuery(() => db.activities.filter((a) => a.sport === "run").toArray(), [], []);
+  if (!all.length) return null;
+
+  const weeks = Array.from({ length: 12 }, (_, i) => addDays(from, i * 7));
+  const perWeek = weeks.map((w) => recent.filter((r) => r.date >= w && r.date < addDays(w, 7)).reduce((a, r) => a + r.distanceM, 0));
+  const pace = (list: typeof all) => {
+    const m = list.reduce((a, r) => a + r.distanceM, 0), sec = list.reduce((a, r) => a + r.movingS, 0);
+    return { m, sec };
+  };
+  const last4 = pace(recent.filter((r) => r.date >= addDays(monday, -21)));
+  const prev4 = pace(recent.filter((r) => r.date >= addDays(monday, -49) && r.date < addDays(monday, -21)));
+  const longest = all.reduce((a, r) => (r.distanceM > a.distanceM ? r : a), all[0]);
+  const fiveK = all.filter((r) => r.distanceM >= 5000);
+  const fastest = fiveK.length ? fiveK.reduce((a, r) => (r.movingS / r.distanceM < a.movingS / a.distanceM ? r : a), fiveK[0]) : null;
+  const short = (d: string) => parseDay(d).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+  const faster = last4.m && prev4.m && last4.sec / last4.m < prev4.sec / prev4.m;
+
+  return (
+    <section className="card">
+      <div className="card-head"><h2>Running</h2></div>
+      <BarChart height={130} label={`Weekly running distance for 12 weeks in ${u}`}
+        data={weeks.map((w, i) => ({ x: parseDay(w).toLocaleDateString(undefined, { month: "numeric", day: "numeric" }), y: Math.round(toUnit(perWeek[i], u) * 10) / 10 }))} />
+      <div className="stats">
+        <div>
+          <span className="label">Avg pace, 4 weeks</span>
+          <span className="stat">{last4.m ? formatPace(last4.m, last4.sec, u) : "—"}</span>
+          {prev4.m > 0 && last4.m > 0 && <span className={`small ${faster ? "up" : "muted"}`}>{faster ? "Faster than" : "vs"} {formatPace(prev4.m, prev4.sec, u)} before</span>}
+        </div>
+        <div>
+          <span className="label">12-week total</span>
+          <span className="stat">{fmt(toUnit(perWeek.reduce((a, b) => a + b, 0), u), 1)}<span className="unit">{u}</span></span>
+        </div>
+      </div>
+      <div className="rows">
+        <div className="row"><span className="name">Longest run</span><span className="sub">{short(longest.date)}</span><span className="val">{toUnit(longest.distanceM, u).toFixed(2)} {u}</span></div>
+        {fastest && <div className="row"><span className="name">Fastest pace, 5K or longer</span><span className="sub">{short(fastest.date)} · {toUnit(fastest.distanceM, u).toFixed(2)} {u} in {formatTime(fastest.movingS)}</span><span className="val">{formatPace(fastest.distanceM, fastest.movingS, u)}</span></div>}
+      </div>
+    </section>
   );
 }

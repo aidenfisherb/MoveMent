@@ -1,0 +1,219 @@
+<title>Workout Screen Layouts</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Manrope:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: four phone mockups of the in-workout screen (no column table), wrapping to one column on phones. Single dark look from the personal UI style. */
+:root {
+  --bg:#000; --surface:#0E0F11; --surface-2:#17181B; --line:#2A2C31; --line-strong:#3A3D44;
+  --fg:#F2F2F2; --muted:#8B8E96; --faint:#5A5D64; --accent:#FF5A1F; --accent-dim:rgba(255,90,31,.14); --on-accent:#000;
+  --success:#3DDC84;
+  --font-text:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-num:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  color-scheme: dark;
+}
+* { box-sizing:border-box; }
+body { background:var(--bg); color:var(--fg); font:400 14px/1.5 var(--font-text); -webkit-font-smoothing:antialiased; margin:0; }
+.page { max-width:1640px; margin:0 auto; padding-block:28px 64px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); display:grid; gap:24px; }
+h1 { margin:0; font-weight:800; font-size:26px; letter-spacing:-.01em; text-wrap:balance; }
+.lead { margin:0; color:var(--muted); max-width:72ch; }
+.label { font:600 10.5px/1.2 var(--font-text); text-transform:uppercase; letter-spacing:.08em; color:var(--muted); }
+.options { display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%, 360px), 1fr)); gap:28px; align-items:start; }
+.opt { display:grid; gap:12px; min-width:0; }
+.opt header { display:grid; gap:4px; }
+.opt header b { font-weight:800; font-size:17px; }
+.opt header b span { color:var(--accent); font-family:var(--font-num); font-size:14px; margin-right:6px; }
+.opt header p { margin:0; color:var(--muted); font-size:13px; }
+.why { margin:0; padding-left:18px; color:var(--muted); font-size:12.5px; display:grid; gap:2px; }
+.phone { width:100%; max-width:380px; border:1px solid var(--line-strong); border-radius:30px; overflow:hidden; background:var(--bg); justify-self:center; }
+.scr { padding:16px 14px 14px; display:grid; gap:10px; }
+.num { font-family:var(--font-num); font-variant-numeric:tabular-nums; }
+.muted { color:var(--muted); } .faint { color:var(--faint); } .small { font-size:11.5px; }
+.spread { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+.top { display:flex; justify-content:space-between; align-items:center; }
+.top b { font-size:19px; font-weight:800; }
+.btn { height:34px; padding:0 14px; border-radius:999px; border:1px solid var(--line); font:700 13px var(--font-text); display:inline-flex; align-items:center; justify-content:center; gap:6px; color:var(--fg); white-space:nowrap; }
+.btn.p { background:var(--accent); border-color:var(--accent); color:var(--on-accent); }
+.btn.full { width:100%; } .btn.lg { height:46px; font-size:15px; }
+.btn.ghost { border-color:transparent; color:var(--muted); }
+.card { border:1px solid var(--line); border-radius:10px; padding:12px; display:grid; gap:8px; }
+.card.cur { border-color:var(--accent); }
+.ex { font-weight:800; font-size:16px; }
+svg.i { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; flex:none; }
+.dot { width:32px; height:32px; border-radius:50%; border:2px solid var(--accent); color:var(--accent); display:grid; place-items:center; font:600 13px var(--font-num); flex:none; }
+.dot.on { background:var(--accent); color:var(--on-accent); }
+.dot.on svg { width:16px; height:16px; stroke-width:2.8; }
+.dot.dim { border-color:var(--line-strong); color:var(--faint); }
+
+/* A: sentence rows */
+.srow { display:flex; align-items:center; gap:12px; padding:6px 0; border-top:1px solid var(--line); }
+.srow:first-of-type { border-top:0; }
+.srow .val { font:600 18px var(--font-num); }
+.srow .val small { font-size:12px; color:var(--muted); font-weight:400; margin:0 4px 0 2px; }
+.srow.done .val { color:var(--muted); }
+.srow .hint { margin-left:auto; font:11px var(--font-num); color:var(--faint); }
+.srow .hint.up { color:var(--success); }
+
+/* B: focus set */
+.chipline { display:flex; gap:6px; flex-wrap:wrap; }
+.sc { height:28px; padding:0 10px 0 4px; border-radius:999px; border:1px solid var(--line); display:inline-flex; align-items:center; gap:6px; font:12px var(--font-num); color:var(--muted); }
+.sc .mini { width:20px; height:20px; border-radius:50%; background:var(--accent); color:var(--on-accent); display:grid; place-items:center; }
+.sc .mini svg { width:12px; height:12px; stroke-width:3; }
+.sc.todo { color:var(--faint); padding-left:10px; }
+.stepper { display:grid; grid-template-columns:40px 1fr 40px; align-items:center; border:1px solid var(--line); border-radius:12px; height:56px; padding:0 6px; }
+.stepper .pm { width:36px; height:36px; border-radius:50%; border:1px solid var(--line); display:grid; place-items:center; color:var(--fg); }
+.stepper .v { text-align:center; font:700 24px var(--font-num); }
+.stepper .v small { font-size:12px; color:var(--muted); font-weight:400; margin-left:3px; }
+.two { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.collapsed { display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border:1px solid var(--line); border-radius:10px; }
+.collapsed b { font-size:14px; } .collapsed span { font:11.5px var(--font-num); color:var(--muted); }
+
+/* C: set chips grid */
+.chips3 { display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; }
+.setchip { border:2px solid var(--accent); border-radius:14px; padding:8px 6px; display:grid; justify-items:center; gap:0; }
+.setchip .w { font:700 17px var(--font-num); }
+.setchip .r { font:12px var(--font-num); color:var(--muted); }
+.setchip .k { font:600 10px var(--font-text); letter-spacing:.08em; text-transform:uppercase; color:var(--accent); }
+.setchip.on { background:var(--accent); color:var(--on-accent); }
+.setchip.on .r, .setchip.on .k { color:var(--on-accent); opacity:.75; }
+.setchip.add { border:1px dashed var(--line-strong); color:var(--muted); place-content:center; font:600 12px var(--font-text); }
+.keypad { border-top:1px solid var(--line); margin:0 -14px -14px; padding:10px 14px 14px; background:var(--surface); display:grid; gap:8px; }
+.keys { display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; }
+.keys span { height:36px; border-radius:8px; background:var(--surface-2); display:grid; place-items:center; font:600 14px var(--font-num); }
+.keys span.a { background:var(--accent); color:var(--on-accent); font-family:var(--font-text); }
+.edit2 { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.edit2 div { border:1px solid var(--line); border-radius:8px; padding:6px 10px; display:grid; }
+.edit2 div.f { border-color:var(--accent); }
+.edit2 b { font:700 18px var(--font-num); }
+
+/* D: one exercise at a time */
+.progress { display:flex; gap:4px; }
+.progress i { flex:1; height:4px; border-radius:2px; background:var(--line); }
+.progress i.on { background:var(--accent); } .progress i.cur { background:var(--fg); }
+.giant { text-align:center; display:grid; gap:2px; padding:8px 0; }
+.giant .n { font:700 48px/1 var(--font-num); letter-spacing:-.02em; }
+.giant .n small { font-size:16px; color:var(--muted); font-weight:400; margin-left:4px; }
+.giant .x { font:600 14px var(--font-num); color:var(--muted); }
+.ring { width:120px; height:120px; justify-self:center; position:relative; display:grid; place-items:center; }
+.ring svg { position:absolute; inset:0; width:120px; height:120px; }
+.ring b { font:700 26px var(--font-num); }
+.ring span { font:600 10px var(--font-text); letter-spacing:.08em; color:var(--muted); text-transform:uppercase; position:absolute; bottom:30px; }
+.setsrow { display:flex; justify-content:center; gap:10px; }
+.nav2 { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="check" viewBox="0 0 24 24"><path d="M5 12.5 10 17l9-10"/></symbol>
+  <symbol id="plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+  <symbol id="left" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+  <symbol id="right" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+  <symbol id="more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></symbol>
+</svg>
+
+<main class="page">
+  <header style="display:grid;gap:8px">
+    <span class="label">MoveMent · during a workout</span>
+    <h1>Pick a workout screen layout</h1>
+    <p class="lead">Four ways to show your sets without the Set / Last / lb / Reps table. Each keeps the orange set circle. Same Legs workout in every one: squats in progress, two sets done. Tell me a letter, or mix ideas.</p>
+  </header>
+
+  <section class="options">
+    <!-- A -->
+    <article class="opt">
+      <header><b><span>A</span>One line per set</b><p>Each set reads like a sentence: “235 lb × 6”. Tap the numbers to change them. Last time shows as a small hint.</p></header>
+      <div class="phone"><div class="scr">
+        <div class="top"><b>Legs</b><span class="btn p">Finish</span></div>
+        <div class="spread small"><span class="muted">4:28 elapsed</span><span class="muted">Rest <span class="num" style="color:var(--accent)">1:12</span></span></div>
+        <div class="card cur">
+          <div class="spread"><span class="ex">Squat</span><span class="small muted num">Last: 235 × 6</span></div>
+          <div class="srow done"><span class="dot on"><svg class="i"><use href="#check"/></svg></span><span class="val">240<small>lb</small>× 6</span><span class="hint up">+5 lb</span></div>
+          <div class="srow done"><span class="dot on"><svg class="i"><use href="#check"/></svg></span><span class="val">240<small>lb</small>× 6</span><span class="hint up">+5 lb</span></div>
+          <div class="srow"><span class="dot">3</span><span class="val">240<small>lb</small>× 6</span><span class="hint">tap to edit</span></div>
+          <div class="spread"><span class="btn"><svg class="i"><use href="#plus"/></svg>Set</span><span class="btn ghost"><svg class="i"><use href="#more"/></svg></span></div>
+        </div>
+        <div class="card">
+          <div class="spread"><span class="ex">Romanian deadlift</span><span class="small muted num">Last: 195 × 8</span></div>
+          <div class="srow"><span class="dot">1</span><span class="val">195<small>lb</small>× 8</span></div>
+          <div class="srow"><span class="dot">2</span><span class="val">195<small>lb</small>× 8</span></div>
+          <div class="srow"><span class="dot">3</span><span class="val">195<small>lb</small>× 8</span></div>
+        </div>
+      </div></div>
+      <ul class="why"><li>Closest to today's screen, minus the grid and boxes</li><li>Shows how you compare to last time on each set</li></ul>
+    </article>
+
+    <!-- B -->
+    <article class="opt">
+      <header><b><span>B</span>Focus on the current set</b><p>Only the set you're on is big, with + / − buttons. Done sets shrink to small chips; other exercises collapse.</p></header>
+      <div class="phone"><div class="scr">
+        <div class="top"><b>Legs</b><span class="btn p">Finish</span></div>
+        <div class="card cur">
+          <div class="spread"><span class="ex">Squat</span><span class="small muted">Set 3 of 3</span></div>
+          <div class="chipline">
+            <span class="sc"><span class="mini"><svg class="i"><use href="#check"/></svg></span>240 × 6</span>
+            <span class="sc"><span class="mini"><svg class="i"><use href="#check"/></svg></span>240 × 6</span>
+          </div>
+          <div class="two">
+            <div><div class="label" style="margin-bottom:4px">Weight</div><div class="stepper"><span class="pm"><svg class="i"><use href="#minus"/></svg></span><span class="v">240<small>lb</small></span><span class="pm"><svg class="i"><use href="#plus"/></svg></span></div></div>
+            <div><div class="label" style="margin-bottom:4px">Reps</div><div class="stepper"><span class="pm"><svg class="i"><use href="#minus"/></svg></span><span class="v">6</span><span class="pm"><svg class="i"><use href="#plus"/></svg></span></div></div>
+          </div>
+          <span class="small muted num">Last time: 235 × 6 · 235 × 6 · 235 × 6</span>
+          <span class="btn p lg full"><svg class="i"><use href="#check"/></svg>Complete set 3</span>
+        </div>
+        <div class="collapsed"><div style="display:grid"><b>Romanian deadlift</b><span>3 × 8 · 195 lb</span></div><span class="dot dim">0/3</span></div>
+        <div class="collapsed"><div style="display:grid"><b>Leg press</b><span>3 × 12 · 360 lb</span></div><span class="dot dim">0/3</span></div>
+        <span class="btn full"><svg class="i"><use href="#plus"/></svg>Add exercise</span>
+      </div></div>
+      <ul class="why"><li>Big buttons; no keyboard for small weight changes (±5 lb, ±1 rep)</li><li>Whole workout fits on one screen</li></ul>
+    </article>
+
+    <!-- C -->
+    <article class="opt">
+      <header><b><span>C</span>Set tiles</b><p>Each set is a tile with weight and reps. Tap a tile to complete it; tap and hold to edit with a number pad.</p></header>
+      <div class="phone"><div class="scr">
+        <div class="top"><b>Legs</b><span class="btn p">Finish</span></div>
+        <div class="card cur">
+          <div class="spread"><span class="ex">Squat</span><span class="small muted num">Last: 235 × 6</span></div>
+          <div class="chips3">
+            <div class="setchip on"><span class="k">Set 1 ✓</span><span class="w">240</span><span class="r">× 6</span></div>
+            <div class="setchip on"><span class="k">Set 2 ✓</span><span class="w">240</span><span class="r">× 6</span></div>
+            <div class="setchip"><span class="k">Set 3</span><span class="w">240</span><span class="r">× 6</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="spread"><span class="ex">Romanian deadlift</span><span class="small muted num">Last: 195 × 8</span></div>
+          <div class="chips3">
+            <div class="setchip"><span class="k">Set 1</span><span class="w">195</span><span class="r">× 8</span></div>
+            <div class="setchip"><span class="k">Set 2</span><span class="w">195</span><span class="r">× 8</span></div>
+            <div class="setchip add">+ Set</div>
+          </div>
+        </div>
+        <div class="keypad">
+          <div class="spread small"><span class="muted">Editing Squat · set 3</span><span class="muted">Done</span></div>
+          <div class="edit2"><div class="f"><span class="label">lb</span><b>240</b></div><div><span class="label">Reps</span><b>6</b></div></div>
+          <div class="keys"><span>1</span><span>2</span><span>3</span><span>−5</span><span>4</span><span>5</span><span>6</span><span>+5</span><span>7</span><span>8</span><span>9</span><span>⌫</span><span>.</span><span>0</span><span class="a" style="grid-column:span 2">Next</span></div>
+        </div>
+      </div></div>
+      <ul class="why"><li>Most compact; a 5-set exercise fits in two rows</li><li>Custom number pad means no iPhone keyboard covering things</li></ul>
+    </article>
+
+    <!-- D -->
+    <article class="opt">
+      <header><b><span>D</span>One exercise at a time</b><p>Full screen for the current exercise: huge numbers, one big button, and a rest countdown after each set. Swipe or tap to move between exercises.</p></header>
+      <div class="phone"><div class="scr">
+        <div class="top"><span class="btn ghost" style="padding:0"><svg class="i"><use href="#left"/></svg>Legs</span><span class="btn p">Finish</span></div>
+        <div class="progress"><i class="cur"></i><i></i><i></i></div>
+        <div style="text-align:center;display:grid;gap:2px"><span class="label">Exercise 1 of 3</span><span style="font-weight:800;font-size:22px">Squat</span><span class="small muted num">Last time 235 × 6</span></div>
+        <div class="setsrow"><span class="dot on"><svg class="i"><use href="#check"/></svg></span><span class="dot on"><svg class="i"><use href="#check"/></svg></span><span class="dot">3</span></div>
+        <div class="ring">
+          <svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" fill="none" stroke="#2A2C31" stroke-width="8"/><circle cx="60" cy="60" r="52" fill="none" stroke="#FF5A1F" stroke-width="8" stroke-linecap="round" stroke-dasharray="196 327" transform="rotate(-90 60 60)"/></svg>
+          <b>1:12</b><span>Rest</span>
+        </div>
+        <div class="giant"><span class="label">Set 3</span><span class="n">240<small>lb</small></span><span class="x">× 6 reps</span></div>
+        <span class="btn p lg full"><svg class="i"><use href="#check"/></svg>Complete set</span>
+        <div class="nav2"><span class="btn"><svg class="i"><use href="#left"/></svg>Previous</span><span class="btn">Next: RDL<svg class="i"><use href="#right"/></svg></span></div>
+      </div></div>
+      <ul class="why"><li>Best mid-set: readable from a distance, one obvious button</li><li>Rest timer counts down from a target (e.g. 2:00) and buzzes</li><li>Harder to see the whole workout at a glance</li></ul>
+    </article>
+  </section>
+</main>

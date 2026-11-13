@@ -1,13 +1,16 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import { useState } from "react";
-import { db, type Routine, type Workout } from "../../data/db";
+import { db, type Activity, type Routine, type Workout } from "../../data/db";
 import { useActiveWorkout, useExercises, useSettings } from "../../data/hooks";
 import { parseDay } from "../../lib/dates";
 import { fmt } from "../../lib/format";
+import { distUnitFor, formatPace, formatTime, toUnit } from "../../lib/running";
 import { Icon } from "../../ui";
 import { ActiveWorkout } from "./ActiveWorkout";
 import { RoutineEditor } from "./RoutineEditor";
-import { formatDuration, startWorkout } from "./trainingActions";
+import { startWorkout } from "./trainingActions";
+import { activityLabel, RunDetailSheet } from "./runs/RunSheets";
+import { RunsCard } from "./runs/RunsCard";
 import { WorkoutDetail } from "./WorkoutDetail";
 
 export default function TrainScreen() {
@@ -16,7 +19,13 @@ export default function TrainScreen() {
   return <TrainHome />;
 }
 
-/* ---------------- Home: routines + history ---------------- */
+/* ---------------- Home: running, routines, history ---------------- */
+
+/** "54 min" or "1 h 05 min" for workout length. */
+function fmtMinutes(ms: number) {
+  const m = Math.round(ms / 60000);
+  return m >= 60 ? `${Math.floor(m / 60)} h ${String(m % 60).padStart(2, "0")} min` : `${m} min`;
+}
 
 function TrainHome() {
   const routines = useLiveQuery(() => db.routines.orderBy("name").toArray(), [], []);
@@ -36,12 +45,23 @@ function TrainHome() {
   }, [history], {} as Record<number, { sets: number; volume: number }>);
   const [editing, setEditing] = useState<Routine | "new" | null>(null);
   const [viewing, setViewing] = useState<Workout | null>(null);
+  const [viewingRun, setViewingRun] = useState<Activity | null>(null);
   const settings = useSettings();
+  const u = distUnitFor(settings.unit);
+  const activities = useLiveQuery(() => db.activities.orderBy("startedAt").reverse().limit(30).toArray(), [], []);
+  // One timeline: lifting sessions and runs/cardio, newest first.
+  const timeline = [
+    ...history.map((w) => ({ kind: "lift" as const, at: w.startedAt, w })),
+    ...activities.map((a) => ({ kind: "cardio" as const, at: a.startedAt, a }))
+  ].sort((x, y) => y.at - x.at).slice(0, 30);
+  const dayLabel = (d: string) => parseDay(d).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
 
   return (
     <main className="screen">
       <div className="screen-head"><h1>Train</h1></div>
       <button className="btn btn-primary btn-full" type="button" onClick={() => startWorkout()}><Icon name="play" />Start empty workout</button>
+
+      <RunsCard />
 
       <section className="card">
         <div className="card-head">
@@ -70,23 +90,30 @@ function TrainHome() {
 
       <section className="card">
         <div className="card-head"><h2>History</h2></div>
-        {history.length ? (
+        {timeline.length ? (
           <div className="rows">
-            {history.map((w) => (
-              <button key={w.id} type="button" className="row" onClick={() => setViewing(w)}>
-                <span className="name">{w.name}</span>
-                <span className="sub">{parseDay(w.date).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })} · {formatDuration((w.finishedAt || 0) - w.startedAt)}</span>
-                <span className="val">{setCounts[w.id!]?.sets ?? 0} sets{setCounts[w.id!]?.volume ? <><br /><span className="muted">{fmt(setCounts[w.id!].volume)} {settings.unit}</span></> : null}</span>
+            {timeline.map((t) => t.kind === "lift" ? (
+              <button key={`w${t.w.id}`} type="button" className="row" onClick={() => setViewing(t.w)}>
+                <span className="name"><Icon name="dumbbell" size={14} /> {t.w.name}</span>
+                <span className="sub">{dayLabel(t.w.date)} · {fmtMinutes((t.w.finishedAt || 0) - t.w.startedAt)}</span>
+                <span className="val">{setCounts[t.w.id!]?.sets ?? 0} sets{setCounts[t.w.id!]?.volume ? <><br /><span className="muted">{fmt(setCounts[t.w.id!].volume)} {settings.unit}</span></> : null}</span>
+              </button>
+            ) : (
+              <button key={`a${t.a.id}`} type="button" className="row" onClick={() => setViewingRun(t.a)}>
+                <span className="name"><Icon name="run" size={14} /> {t.a.name}</span>
+                <span className="sub">{dayLabel(t.a.date)} · {activityLabel(t.a)} · {formatTime(t.a.movingS)}</span>
+                <span className="val">{toUnit(t.a.distanceM, u).toFixed(2)} {u}<br /><span className="muted">{formatPace(t.a.distanceM, t.a.movingS, u)}</span></span>
               </button>
             ))}
           </div>
         ) : (
-          <span className="muted">Finished workouts show up here.</span>
+          <span className="muted">Finished workouts and runs show up here.</span>
         )}
       </section>
 
       {editing && <RoutineEditor routine={editing === "new" ? undefined : editing} onClose={() => setEditing(null)} />}
       {viewing && <WorkoutDetail workout={viewing} onClose={() => setViewing(null)} />}
+      {viewingRun && <RunDetailSheet activity={viewingRun} onClose={() => setViewingRun(null)} />}
     </main>
   );
 }

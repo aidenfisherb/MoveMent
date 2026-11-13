@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>MoveMent · Strava</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#000; --surface:#0E0F11; --line:#2A2C31; --fg:#F2F2F2; --muted:#8B8E96; --accent:#FF5A1F; --danger:#FF4D6A; --success:#3DDC84; color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 400 15px/1.5 "Manrope", system-ui, -apple-system, sans-serif; -webkit-font-smoothing: antialiased; }
+  main { max-width: 480px; margin: 0 auto; padding: calc(env(safe-area-inset-top, 0px) + 32px) max(16px, env(safe-area-inset-right, 0px)) 32px max(16px, env(safe-area-inset-left, 0px)); display: grid; gap: 16px; }
+  h1 { margin: 0; font-weight: 800; font-size: 24px; }
+  p { margin: 0; color: var(--muted); }
+  .card { border: 1px solid var(--line); border-radius: 10px; padding: 14px; display: grid; gap: 12px; }
+  .label { font: 600 11px/1.2 "Manrope", sans-serif; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+  code { display: block; font: 600 15px/1.4 "JetBrains Mono", ui-monospace, monospace; word-break: break-all; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px; user-select: all; -webkit-user-select: all; }
+  .btn { height: 44px; border-radius: 9999px; border: 1px solid var(--line); background: transparent; color: var(--fg); font: 700 15px "Manrope", sans-serif; display: flex; align-items: center; justify-content: center; text-decoration: none; cursor: pointer; }
+  .primary { background: var(--accent); border-color: var(--accent); color: #000; }
+  ol { margin: 0; padding-left: 20px; color: var(--muted); display: grid; gap: 4px; }
+  .ok { color: var(--success); } .err { color: var(--danger); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+</head>
+<body>
+<main>
+  <h1 id="title">Almost connected</h1>
+  <div id="ok" class="card" hidden>
+    <span class="label">Your Strava code</span>
+    <code id="code"></code>
+    <button id="copy" class="btn primary" type="button">Copy code</button>
+    <ol>
+      <li>Tap <b>Copy code</b>.</li>
+      <li>Open MoveMent from your Home Screen.</li>
+      <li>On Train, tap <b>Connect Strava</b>, then <b>Paste code</b>.</li>
+    </ol>
+    <p>The code works once and expires in a few minutes. If it fails, approve on Strava again.</p>
+  </div>
+  <div id="bad" class="card" hidden>
+    <p class="err" id="why"></p>
+    <p>Go back to MoveMent and tap <b>Open Strava to approve</b> again.</p>
+  </div>
+  <a class="btn" href="./#train">Open MoveMent here</a>
+</main>
+<script>
+  // Strava sends the user here with ?code=... after they tap Authorize.
+  var q = new URLSearchParams(location.search);
+  var code = q.get("code");
+  if (code && (q.get("scope") || "").indexOf("activity:read") === -1) {
+    document.getElementById("bad").hidden = false;
+    document.getElementById("title").textContent = "Activity access is needed";
+    document.getElementById("why").textContent = "Strava was approved without permission to read activities. Leave the activities box checked on the Strava page.";
+  } else if (code) {
+    document.getElementById("ok").hidden = false;
+    document.getElementById("code").textContent = code;
+    // If this page shares storage with the app (e.g. on a computer), the app picks the code up by itself.
+    try { localStorage.setItem("movement.stravaCode", code); } catch (e) {}
+    document.getElementById("copy").onclick = function () {
+      var b = this;
+      var done = function () { b.textContent = "Copied. Now open MoveMent"; b.className = "btn"; };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(code).then(done, function () { selectCode(); });
+      else selectCode();
+    };
+  } else {
+    document.getElementById("bad").hidden = false;
+    document.getElementById("title").textContent = "Strava wasn't connected";
+    document.getElementById("why").textContent = q.get("error") === "access_denied" ? "You tapped Cancel on Strava, so no access was given." : "No code came back from Strava.";
+  }
+  function selectCode() {
+    var r = document.createRange(); r.selectNodeContents(document.getElementById("code"));
+    var s = getSelection(); s.removeAllRanges(); s.addRange(r);
+  }
+</script>
+</body>
+</html>

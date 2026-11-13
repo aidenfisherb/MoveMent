@@ -115,6 +115,7 @@ button.row:hover { background: var(--surface); }
   padding: 10px max(16px, env(safe-area-inset-right, 0px)) calc(16px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); display: grid; gap: 12px; align-content: start;
 }
 .sheet.tall { height: 92dvh; }
+.sheet { grid-auto-rows: max-content; }
 .grabber { width: 36px; height: 4px; border-radius: 99px; background: var(--line); justify-self: center; }
 @media (prefers-reduced-motion: no-preference) {
   .sheet { animation: rise .25s ease-out; }
@@ -130,16 +131,26 @@ button.row:hover { background: var(--surface); }
 .empty { display: grid; justify-items: center; text-align: center; gap: 6px; padding: 16px 8px; }
 .empty svg { width: 32px; height: 32px; color: var(--faint); }
 
-/* Workout set grid */
-.setgrid { display: grid; grid-template-columns: 28px 1fr 1fr 1fr 40px; gap: 6px; align-items: center; }
-.setgrid .h { font: 600 11px var(--font-text); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
-.setgrid .input { height: 36px; text-align: center; padding: 0 6px; }
-.setgrid .prev { font: 12px var(--font-num); color: var(--faint); text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.setgrid.cardio { grid-template-columns: 28px 1fr 1fr 40px; }
-.check { width: 36px; height: 36px; border-radius: var(--r-pill); border: 1px solid var(--line); background: transparent; color: var(--muted); display: grid; place-items: center; cursor: pointer; }
-.check svg { width: 18px; height: 18px; }
-.check[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
-.setdone .input { color: var(--muted); }
+/* Set circle: orange ring with the set number; tap to fill it orange with a check. */
+.set-dot { width: 36px; height: 36px; border-radius: var(--r-pill); border: 2px solid var(--accent); background: transparent; color: var(--accent); display: grid; place-items: center; cursor: pointer; font: 600 14px var(--font-num); padding: 0; transition: background .15s ease-out, color .15s ease-out, transform .1s ease-out; }
+.set-dot svg { width: 18px; height: 18px; stroke-width: 2.5; }
+.set-dot[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+.set-dot:active { transform: scale(.92); }
+
+/* Workout: one line per set ("240 lb × 6"), tap the numbers to edit. */
+.card.current { border-color: var(--accent); }
+.set-rows { display: grid; }
+.set-row { display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 6px 0; border-top: 1px solid var(--line); }
+.set-row:first-child { border-top: 0; }
+.set-val { background: none; border: 0; padding: 4px 6px; margin-left: -6px; border-radius: 8px; color: var(--fg); font: 600 18px var(--font-num); font-variant-numeric: tabular-nums; cursor: pointer; text-align: left; min-width: 0; }
+.set-val small { font-size: 12px; font-weight: 400; color: var(--muted); margin: 0 6px 0 2px; }
+.set-val:hover { background: var(--surface); }
+.set-row.done .set-val { color: var(--muted); }
+.set-hint { margin-left: auto; font: 12px var(--font-num); color: var(--muted); white-space: nowrap; }
+.set-hint.up { color: var(--success); }
+.set-edit { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0; }
+.set-edit .input { width: 72px; height: 36px; text-align: center; padding: 0 6px; flex: none; }
+.set-edit .btn { margin-left: auto; }
 
 .scanner { position: relative; border-radius: var(--r-card); overflow: hidden; border: 1px solid var(--line); aspect-ratio: 4 / 3; background: var(--surface); max-width: 100%; }
 .scanner video { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -162,3 +173,10 @@ button.row:hover { background: var(--surface); }
 .ai-note { display: flex; gap: 8px; align-items: flex-start; font-size: 12px; color: var(--muted); }
 .ai-note svg { width: 16px; height: 16px; flex: none; color: var(--accent); margin-top: 1px; }
 textarea.input { height: auto; min-height: 140px; padding: 10px 12px; font: 13px/1.5 var(--font-num); resize: vertical; }
+
+/* Runs */
+.effort { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; }
+.effort button { height: 32px; border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--muted); font: 600 12px var(--font-num); cursor: pointer; padding: 0; }
+.effort button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.row .name svg { vertical-align: -2px; color: var(--muted); }
+a.btn { text-decoration: none; }

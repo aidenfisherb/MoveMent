@@ -6,6 +6,7 @@ import { useActiveWorkout, useSettings } from "../../data/hooks";
 import { addDays, dayKey, parseDay } from "../../lib/dates";
 import { cap, fmt } from "../../lib/format";
 import { sumMacros } from "../../lib/macros";
+import { distUnitFor, toUnit } from "../../lib/running";
 import { Dial, Icon } from "../../ui";
 import { WeighInSheet } from "../body/WeighInSheet";
 
@@ -18,6 +19,9 @@ export default function TodayScreen({ go }: { go: (r: Route) => void }) {
   const left = t.kcal - total.kcal;
   const active = useActiveWorkout();
   const todaysWorkouts = useLiveQuery(() => db.workouts.where("date").equals(today).filter((w) => !!w.finishedAt).toArray(), [today], []);
+  const todaysCardio = useLiveQuery(() => db.activities.where("date").equals(today).toArray(), [today], []);
+  const u = distUnitFor(settings.unit);
+  const doneToday = [...todaysWorkouts.map((w) => w.name), ...todaysCardio.map((a) => `${a.name} · ${toUnit(a.distanceM, u).toFixed(1)} ${u}`)];
   const weights = useLiveQuery(() => db.weights.orderBy("date").reverse().limit(8).toArray(), [], []);
   const latest = weights[0];
   const weekAgo = weights.find((w) => w.date <= addDays(today, -7));
@@ -73,9 +77,9 @@ export default function TodayScreen({ go }: { go: (r: Route) => void }) {
             <div><div>{active.name}</div><div className="small muted">In progress</div></div>
             <button className="btn btn-primary btn-sm" type="button" onClick={() => go("train")}>Resume</button>
           </div>
-        ) : todaysWorkouts.length ? (
+        ) : doneToday.length ? (
           <div className="spread">
-            <div><div>{todaysWorkouts.map((w) => w.name).join(", ")}</div><div className="small up">Done today</div></div>
+            <div><div>{doneToday.join(", ")}</div><div className="small up">Done today</div></div>
             <button className="btn btn-sm" type="button" onClick={() => go("train")}>View</button>
           </div>
         ) : (

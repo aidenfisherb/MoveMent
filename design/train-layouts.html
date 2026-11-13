@@ -1,0 +1,277 @@
+<title>Train Tab Layouts</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Manrope:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: four phone mockups of the Train tab side by side (wrapping on small screens), plus the new set-circle detail. Single dark look from the personal UI style. */
+:root {
+  --bg:#000; --surface:#0E0F11; --surface-2:#17181B; --line:#2A2C31; --line-strong:#3A3D44;
+  --fg:#F2F2F2; --muted:#8B8E96; --faint:#5A5D64; --accent:#FF5A1F; --accent-dim:rgba(255,90,31,.14); --on-accent:#000;
+  --success:#3DDC84; --grid:#1A1B1E;
+  --font-text:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-num:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  color-scheme: dark;
+}
+* { box-sizing:border-box; }
+body { background:var(--bg); color:var(--fg); font:400 14px/1.5 var(--font-text); -webkit-font-smoothing:antialiased; margin:0; }
+.page { max-width:1640px; margin:0 auto; padding-block:28px 64px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); display:grid; gap:24px; }
+h1 { margin:0; font-weight:800; font-size:26px; letter-spacing:-.01em; text-wrap:balance; }
+.lead { margin:0; color:var(--muted); max-width:70ch; }
+.options { display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%, 360px), 1fr)); gap:28px; align-items:start; }
+.opt { display:grid; gap:12px; min-width:0; }
+.opt header { display:grid; gap:4px; }
+.opt header b { font-weight:800; font-size:17px; }
+.opt header b span { color:var(--accent); font-family:var(--font-num); font-size:14px; margin-right:6px; }
+.opt header p { margin:0; color:var(--muted); font-size:13px; }
+.why { margin:0; padding-left:18px; color:var(--muted); font-size:12.5px; display:grid; gap:2px; }
+
+/* Phone frame */
+.phone { width:100%; max-width:380px; border:1px solid var(--line-strong); border-radius:30px; overflow:hidden; background:var(--bg); justify-self:center; }
+.scr { padding:18px 14px 10px; display:grid; gap:10px; }
+.tabbar { border-top:1px solid var(--line); display:grid; grid-template-columns:repeat(4,1fr); height:52px; align-items:center; text-align:center; font:600 10px var(--font-text); color:var(--muted); }
+.tabbar .on { color:var(--accent); }
+.tabbar svg { width:20px; height:20px; display:block; margin:0 auto 2px; }
+svg.i { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:1.75; stroke-linecap:round; stroke-linejoin:round; flex:none; }
+
+/* Shared pieces */
+.h1 { font-weight:800; font-size:22px; letter-spacing:-.01em; }
+.label { font:600 10.5px/1.2 var(--font-text); text-transform:uppercase; letter-spacing:.08em; color:var(--muted); }
+.num { font-family:var(--font-num); font-variant-numeric:tabular-nums; }
+.muted { color:var(--muted); } .small { font-size:11.5px; }
+.card { border:1px solid var(--line); border-radius:10px; padding:11px; display:grid; gap:8px; }
+.spread { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+.btn { height:36px; padding:0 14px; border-radius:999px; border:1px solid var(--line); font:700 13px var(--font-text); display:inline-flex; align-items:center; justify-content:center; gap:6px; color:var(--fg); white-space:nowrap; }
+.btn.p { background:var(--accent); border-color:var(--accent); color:var(--on-accent); }
+.btn.sm { height:28px; padding:0 10px; font-size:12px; }
+.btn.full { width:100%; }
+.rows > div { display:grid; grid-template-columns:1fr auto; gap:0 8px; padding:6px 0; border-top:1px solid var(--line); }
+.rows > div:first-child { border-top:0; }
+.rows .n { font-size:13px; display:flex; align-items:center; gap:6px; }
+.rows .s { font-size:11px; color:var(--muted); }
+.rows .v { grid-row:1 / span 2; grid-column:2; text-align:right; font:12px var(--font-num); align-self:center; }
+.rows .v span { color:var(--muted); display:block; font-size:11px; }
+.stat { font:600 18px/1.1 var(--font-num); }
+.stat small { font-size:.62em; color:var(--muted); margin-left:2px; }
+.bars { display:flex; align-items:flex-end; gap:5px; height:46px; }
+.bars i { flex:1; background:var(--accent); border-radius:3px 3px 0 0; }
+.bars i.now { background:var(--fg); }
+.seg { display:flex; border:1px solid var(--line); border-radius:999px; padding:3px; gap:2px; }
+.seg span { flex:1; text-align:center; height:28px; line-height:28px; border-radius:999px; font:600 12px var(--font-text); color:var(--muted); }
+.seg span.on { background:var(--accent); color:var(--on-accent); }
+
+/* Week strip (A, C) */
+.week { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; text-align:center; }
+.week div { display:grid; gap:4px; justify-items:center; font:600 10.5px var(--font-text); color:var(--muted); }
+.week .d { width:30px; height:30px; border-radius:50%; border:1px solid var(--line); display:grid; place-items:center; font:600 11px var(--font-num); color:var(--fg); }
+.week .lift .d { background:var(--accent); border-color:var(--accent); color:var(--on-accent); }
+.week .run .d { border:2px solid var(--accent); color:var(--accent); }
+.week .both .d { background:var(--accent); border-color:var(--fg); color:var(--on-accent); box-shadow:0 0 0 2px var(--bg) inset; }
+.week .today .d { outline:1px dashed var(--fg); outline-offset:2px; }
+.week .future { opacity:.45; }
+
+/* A: up next hero */
+.hero { border:1px solid var(--accent); border-radius:12px; padding:12px; display:grid; gap:8px; background:linear-gradient(180deg, rgba(255,90,31,.08), transparent 60%); }
+.hero .t { font-weight:800; font-size:20px; }
+.chips { display:flex; gap:6px; overflow:hidden; }
+.chip { height:26px; padding:0 10px; border-radius:999px; border:1px solid var(--line); font:600 11.5px var(--font-text); display:inline-flex; align-items:center; white-space:nowrap; color:var(--fg); }
+.tiles { display:grid; grid-template-columns:repeat(3, 1fr); gap:6px; }
+.tile { border:1px solid var(--line); border-radius:10px; padding:9px; display:grid; gap:2px; }
+.tile b { font-size:13px; } .tile span { font-size:10.5px; color:var(--muted); }
+
+/* C: action tiles */
+.big2 { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.big { border-radius:12px; padding:12px; display:grid; gap:6px; min-height:92px; align-content:space-between; border:1px solid var(--line); }
+.big.p { background:var(--accent); border-color:var(--accent); color:var(--on-accent); }
+.big b { font-weight:800; font-size:15px; } .big span { font-size:11px; opacity:.75; }
+.big svg { width:22px; height:22px; }
+.grid2 { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.rt { border:1px solid var(--line); border-radius:10px; padding:10px; display:grid; gap:6px; }
+.rt b { font-size:14px; } .rt .s { font-size:11px; color:var(--muted); }
+.dots { display:flex; gap:3px; } .dots i { width:6px; height:6px; border-radius:50%; background:var(--line-strong); } .dots i.on { background:var(--accent); }
+
+/* D: dense list */
+.sec { display:grid; gap:6px; padding-top:4px; }
+.sec + .sec { border-top:1px solid var(--line); padding-top:10px; }
+.wk { display:flex; justify-content:space-between; font:600 10.5px var(--font-text); text-transform:uppercase; letter-spacing:.08em; color:var(--muted); padding-top:6px; }
+.wk span { color:var(--fg); text-transform:none; letter-spacing:0; font-family:var(--font-num); font-weight:400; }
+.pills { display:flex; gap:6px; }
+
+/* Set circle detail */
+.detail { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap:20px; align-items:start; }
+.setcard { border:1px solid var(--line); border-radius:10px; padding:12px; display:grid; gap:8px; max-width:380px; }
+.sg { display:grid; grid-template-columns:40px 1fr 1fr 1fr; gap:6px; align-items:center; }
+.sg .h { font:600 10.5px var(--font-text); text-transform:uppercase; letter-spacing:.08em; color:var(--muted); text-align:center; }
+.sg .h:first-child { text-align:left; }
+.dot { width:34px; height:34px; border-radius:50%; border:2px solid var(--accent); color:var(--accent); display:grid; place-items:center; font:600 13px var(--font-num); }
+.dot.on { background:var(--accent); color:var(--on-accent); }
+.dot.on svg { width:17px; height:17px; stroke-width:2.6; }
+.in { height:34px; border-radius:8px; background:var(--surface); border:1px solid var(--line); display:grid; place-items:center; font:13px var(--font-num); }
+.in.done { background:transparent; border-color:transparent; color:var(--muted); }
+.prev { text-align:center; font:11px var(--font-num); color:var(--faint); }
+.note { color:var(--muted); font-size:13px; margin:0; max-width:60ch; }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></symbol>
+  <symbol id="food" viewBox="0 0 24 24"><path d="M4 3v8a3 3 0 0 0 3 3v7M7 3v6M10 3v8a3 3 0 0 1-3 3M17 21V3c-2 1-3 4-3 8h3"/></symbol>
+  <symbol id="db" viewBox="0 0 24 24"><path d="M6 6v12M18 6v12M3 9v6M21 9v6M6 12h12"/></symbol>
+  <symbol id="chart" viewBox="0 0 24 24"><path d="M3 3v18h18M7 15l4-4 3 3 6-6"/></symbol>
+  <symbol id="run" viewBox="0 0 24 24"><circle cx="14" cy="4.5" r="1.8"/><path d="M8 21l3-6 3 2v4M7 12l2-4 4 1 2 3 3 1M11 15l-1-4"/></symbol>
+  <symbol id="play" viewBox="0 0 24 24"><path d="M7 4v16l13-8z"/></symbol>
+  <symbol id="plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="sync" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14.6-4.5M4 4v3.5h3.5M4 13a8 8 0 0 0 14.6 4.5M20 20v-3.5h-3.5"/></symbol>
+  <symbol id="chev" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+  <symbol id="check" viewBox="0 0 24 24"><path d="M5 12.5 10 17l9-10"/></symbol>
+</svg>
+
+<main class="page">
+  <header style="display:grid;gap:8px">
+    <span class="label">MoveMent · Train tab</span>
+    <h1>Pick a Train layout</h1>
+    <p class="lead">Four ways to arrange the same Train tab, using your real kinds of data: routines, runs, lifting history and Strava. Tell me a letter, or mix parts ("A's week strip with D's history"). The set circles at the bottom are already built into the app.</p>
+  </header>
+
+  <section class="options">
+    <!-- A -->
+    <article class="opt">
+      <header><b><span>A</span>Up next</b><p>Opens on what to do today. The app suggests your next routine in the rotation.</p></header>
+      <div class="phone"><div class="scr">
+        <div class="spread"><span class="h1">Train</span><span class="btn sm"><svg class="i"><use href="#sync"/></svg>Strava</span></div>
+        <div class="week">
+          <div class="lift">M<span class="d">9</span></div><div class="run">T<span class="d">10</span></div><div class="both">W<span class="d">11</span></div>
+          <div class="lift">T<span class="d">12</span></div><div class="today run">F<span class="d">13</span></div><div class="future">S<span class="d">14</span></div><div class="future">S<span class="d">15</span></div>
+        </div>
+        <div class="hero">
+          <span class="label" style="color:var(--accent)">Up next · last done 6 days ago</span>
+          <span class="t">Legs</span>
+          <span class="small muted">Squat 3×6 · Romanian deadlift 3×8 · Leg press 3×12</span>
+          <span class="btn p full"><svg class="i"><use href="#play"/></svg>Start Legs</span>
+        </div>
+        <div class="spread" style="gap:8px"><span class="btn full"><svg class="i"><use href="#run"/></svg>Log a run</span><span class="btn full"><svg class="i"><use href="#plus"/></svg>Empty workout</span></div>
+        <div class="card" style="grid-template-columns:repeat(3,1fr);text-align:left">
+          <div><div class="label">Lifts</div><div class="stat">3</div></div>
+          <div><div class="label">Run</div><div class="stat">10.3<small>mi</small></div></div>
+          <div><div class="label">Volume</div><div class="stat">34<small>k lb</small></div></div>
+        </div>
+        <span class="label">Routines</span>
+        <div class="tiles"><div class="tile"><b>Push</b><span>5 ex · Tue</span></div><div class="tile"><b>Pull</b><span>4 ex · Thu</span></div><div class="tile"><b>Legs</b><span>3 ex · Sun</span></div></div>
+        <div class="spread"><span class="label">Recent</span><span class="small muted">See all</span></div>
+        <div class="rows">
+          <div><span class="n"><svg class="i"><use href="#run"/></svg>Easy run</span><span class="s">Today · 44:10</span><span class="v">5.20 mi<span>8:30 /mi</span></span></div>
+          <div><span class="n"><svg class="i"><use href="#db"/></svg>Pull</span><span class="s">Thu · 54 min</span><span class="v">12 sets<span>9,540 lb</span></span></div>
+        </div>
+      </div>
+      <div class="tabbar"><div><svg class="i"><use href="#home"/></svg>Today</div><div><svg class="i"><use href="#food"/></svg>Food</div><div class="on"><svg class="i"><use href="#db"/></svg>Train</div><div><svg class="i"><use href="#chart"/></svg>Progress</div></div></div>
+      <ul class="why"><li>Fewest taps to start the usual thing</li><li>Week strip shows lift days (filled) and run days (ring)</li></ul>
+    </article>
+
+    <!-- B -->
+    <article class="opt">
+      <header><b><span>B</span>Lift / Run tabs</b><p>A switch at the top splits lifting and running into their own focused pages.</p></header>
+      <div class="phone"><div class="scr">
+        <span class="h1">Train</span>
+        <div class="seg"><span class="on">Lift</span><span>Run</span><span>History</span></div>
+        <span class="btn p full"><svg class="i"><use href="#play"/></svg>Start empty workout</span>
+        <div class="card" style="padding:0;gap:0">
+          <div style="padding:11px;display:grid;gap:4px;border-bottom:1px solid var(--line)"><div class="spread"><b style="font-size:15px">Push</b><span class="btn p sm">Start</span></div><span class="small muted">Bench · OHP · Incline DB · Lateral raise · Pushdown</span><span class="small muted num">Last: Tue · 12,863 lb</span></div>
+          <div style="padding:11px;display:grid;gap:4px;border-bottom:1px solid var(--line)"><div class="spread"><b style="font-size:15px">Pull</b><span class="btn p sm">Start</span></div><span class="small muted">Row · Pulldown · Pull-up · Curl</span><span class="small muted num">Last: Thu · 9,540 lb</span></div>
+          <div style="padding:11px;display:grid;gap:4px"><div class="spread"><b style="font-size:15px">Legs</b><span class="btn p sm">Start</span></div><span class="small muted">Squat · RDL · Leg press</span><span class="small muted num">Last: Sun · 22,230 lb</span></div>
+        </div>
+        <span class="btn sm" style="justify-self:start"><svg class="i"><use href="#plus"/></svg>New routine</span>
+        <div class="spread"><span class="label">Recent lifts</span></div>
+        <div class="rows">
+          <div><span class="n">Pull</span><span class="s">Thu · 54 min</span><span class="v">12 sets<span>9,540 lb</span></span></div>
+          <div><span class="n">Push</span><span class="s">Tue · 53 min</span><span class="v">15 sets<span>12,863 lb</span></span></div>
+        </div>
+      </div>
+      <div class="tabbar"><div><svg class="i"><use href="#home"/></svg>Today</div><div><svg class="i"><use href="#food"/></svg>Food</div><div class="on"><svg class="i"><use href="#db"/></svg>Train</div><div><svg class="i"><use href="#chart"/></svg>Progress</div></div></div>
+      <div class="phone" style="max-width:380px"><div class="scr">
+        <div class="seg"><span>Lift</span><span class="on">Run</span><span>History</span></div>
+        <div class="spread"><span class="btn p"><svg class="i"><use href="#run"/></svg>Log a run</span><span class="btn"><svg class="i"><use href="#sync"/></svg>Sync Strava</span></div>
+        <div class="card"><div class="spread"><div><div class="label">This week</div><div class="stat">10.3<small>mi</small></div></div><div style="text-align:right"><div class="label">Last week</div><div class="stat">23.2<small>mi</small></div></div></div><div class="bars"><i style="height:45%"></i><i style="height:80%"></i><i style="height:86%"></i><i style="height:84%"></i><i style="height:100%"></i><i style="height:85%"></i><i class="now" style="height:38%"></i></div></div>
+        <div class="rows"><div><span class="n">Easy run</span><span class="s">Today · Easy</span><span class="v">5.20 mi<span>8:30 /mi</span></span></div><div><span class="n">Morning Run</span><span class="s">Thu · Easy · Strava</span><span class="v">5.26 mi<span>8:45 /mi</span></span></div></div>
+      </div></div>
+      <ul class="why"><li>Each page stays short and calm</li><li>Costs one tap to switch between lifting and running</li></ul>
+    </article>
+
+    <!-- C -->
+    <article class="opt">
+      <header><b><span>C</span>Big buttons + grid</b><p>Two large start buttons, routines as a grid of tiles, and the week as a compact running summary.</p></header>
+      <div class="phone"><div class="scr">
+        <span class="h1">Train</span>
+        <div class="big2">
+          <div class="big p"><svg class="i"><use href="#db"/></svg><div><b>Lift</b><br><span>Start empty</span></div></div>
+          <div class="big"><svg class="i" style="color:var(--accent)"><use href="#run"/></svg><div><b>Run</b><br><span class="muted">Log or sync</span></div></div>
+        </div>
+        <div class="spread"><span class="label">Routines</span><span class="small muted">+ New</span></div>
+        <div class="grid2">
+          <div class="rt"><div class="spread"><b>Push</b><svg class="i" style="color:var(--accent)"><use href="#play"/></svg></div><span class="s">5 exercises</span><div class="dots"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div><span class="s">Last Tue</span></div>
+          <div class="rt"><div class="spread"><b>Pull</b><svg class="i" style="color:var(--accent)"><use href="#play"/></svg></div><span class="s">4 exercises</span><div class="dots"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div><span class="s">Last Thu</span></div>
+          <div class="rt"><div class="spread"><b>Legs</b><svg class="i" style="color:var(--accent)"><use href="#play"/></svg></div><span class="s">3 exercises</span><div class="dots"><i class="on"></i><i class="on"></i><i></i><i></i></div><span class="s">Last Sun</span></div>
+          <div class="rt" style="border-style:dashed;place-content:center;text-align:center;color:var(--muted)"><b style="font-size:13px">+ New routine</b></div>
+        </div>
+        <div class="card" style="grid-template-columns:auto 1fr;align-items:end;gap:12px">
+          <div><div class="label">Running</div><div class="stat">10.3<small>/ 23.2 mi</small></div></div>
+          <div class="bars" style="height:38px"><i style="height:45%"></i><i style="height:80%"></i><i style="height:86%"></i><i style="height:84%"></i><i style="height:100%"></i><i style="height:85%"></i><i class="now" style="height:38%"></i></div>
+        </div>
+        <span class="label">History</span>
+        <div class="rows">
+          <div><span class="n"><svg class="i"><use href="#run"/></svg>Easy run</span><span class="s">Today</span><span class="v">5.20 mi<span>8:30 /mi</span></span></div>
+          <div><span class="n"><svg class="i"><use href="#db"/></svg>Pull</span><span class="s">Thu</span><span class="v">12 sets<span>54 min</span></span></div>
+        </div>
+      </div>
+      <div class="tabbar"><div><svg class="i"><use href="#home"/></svg>Today</div><div><svg class="i"><use href="#food"/></svg>Food</div><div class="on"><svg class="i"><use href="#db"/></svg>Train</div><div><svg class="i"><use href="#chart"/></svg>Progress</div></div></div>
+      <ul class="why"><li>Most visual; big targets for sweaty thumbs</li><li>Dots show how many of a routine's exercises you've progressed lately</li></ul>
+    </article>
+
+    <!-- D -->
+    <article class="opt">
+      <header><b><span>D</span>Clean list</b><p>No boxes. Quiet sections separated by thin lines, with history grouped by week.</p></header>
+      <div class="phone"><div class="scr">
+        <span class="h1">Train</span>
+        <div class="pills"><span class="btn p sm"><svg class="i"><use href="#play"/></svg>Lift</span><span class="btn sm"><svg class="i"><use href="#run"/></svg>Log run</span><span class="btn sm"><svg class="i"><use href="#sync"/></svg>Sync</span></div>
+        <div class="sec">
+          <span class="label">Routines</span>
+          <div class="rows">
+            <div><span class="n">Push</span><span class="s">5 exercises · last Tue</span><span class="v" style="color:var(--accent)">Start ›</span></div>
+            <div><span class="n">Pull</span><span class="s">4 exercises · last Thu</span><span class="v" style="color:var(--accent)">Start ›</span></div>
+            <div><span class="n">Legs</span><span class="s">3 exercises · last Sun</span><span class="v" style="color:var(--accent)">Start ›</span></div>
+          </div>
+        </div>
+        <div class="sec">
+          <div class="wk">This week <span>3 lifts · 10.3 mi</span></div>
+          <div class="rows">
+            <div><span class="n"><svg class="i"><use href="#run"/></svg>Easy run</span><span class="s">Fri · 44:10</span><span class="v">5.20 mi<span>8:30 /mi</span></span></div>
+            <div><span class="n"><svg class="i"><use href="#db"/></svg>Pull</span><span class="s">Thu · 54 min</span><span class="v">12 sets<span>9,540 lb</span></span></div>
+            <div><span class="n"><svg class="i"><use href="#run"/></svg>Morning Run</span><span class="s">Thu · Strava</span><span class="v">5.26 mi<span>8:45 /mi</span></span></div>
+            <div><span class="n"><svg class="i"><use href="#db"/></svg>Push</span><span class="s">Tue · 53 min</span><span class="v">15 sets<span>12,863 lb</span></span></div>
+          </div>
+          <div class="wk">Last week <span>3 lifts · 23.2 mi</span></div>
+          <div class="rows">
+            <div><span class="n"><svg class="i"><use href="#run"/></svg>Long run</span><span class="s">Sat · Strava</span><span class="v">10.50 mi<span>8:42 /mi</span></span></div>
+            <div><span class="n"><svg class="i"><use href="#db"/></svg>Legs</span><span class="s">Sun · 54 min</span><span class="v">9 sets<span>22,230 lb</span></span></div>
+          </div>
+        </div>
+      </div>
+      <div class="tabbar"><div><svg class="i"><use href="#home"/></svg>Today</div><div><svg class="i"><use href="#food"/></svg>Food</div><div class="on"><svg class="i"><use href="#db"/></svg>Train</div><div><svg class="i"><use href="#chart"/></svg>Progress</div></div></div>
+      <ul class="why"><li>Calmest and most compact; reads like a training log</li><li>Weekly totals replace the running chart (chart stays on Progress)</li></ul>
+    </article>
+  </section>
+
+  <section style="display:grid;gap:12px">
+    <span class="label">Already built · during a workout</span>
+    <h1 style="font-size:20px">Set circles</h1>
+    <div class="detail">
+      <div class="setcard">
+        <div class="spread"><b style="font-size:16px">Bench press</b><span class="small muted num">Last: 190×8</span></div>
+        <div class="sg">
+          <span class="h">Set</span><span class="h">Last</span><span class="h">lb</span><span class="h">Reps</span>
+          <span class="dot on"><svg class="i"><use href="#check"/></svg></span><span class="prev">190×8</span><span class="in done">195</span><span class="in done">8</span>
+          <span class="dot on"><svg class="i"><use href="#check"/></svg></span><span class="prev">190×8</span><span class="in done">195</span><span class="in done">7</span>
+          <span class="dot">3</span><span class="prev">190×8</span><span class="in">195</span><span class="in">8</span>
+        </div>
+      </div>
+      <p class="note">Each set starts as an orange ring with its number. Tap it and it fills orange with a check, and that set's numbers dim so the next set stands out. Tap again to undo. The separate check button on the right is gone, so the weight and reps boxes are wider.</p>
+    </div>
+  </section>
+</main>

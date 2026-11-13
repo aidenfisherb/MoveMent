@@ -64,6 +64,31 @@ export interface WorkoutSet {
 
 export interface BodyWeight { date: string; weight: number }
 
+export type Sport = "run" | "walk" | "hike" | "ride" | "swim" | "other";
+export type RunType = "easy" | "long" | "workout" | "race";
+export const RUN_TYPES: RunType[] = ["easy", "long", "workout", "race"];
+
+/** A distance/cardio session: logged by hand or imported from Strava. Distances in meters, times in seconds. */
+export interface Activity {
+  id?: number;
+  date: string;
+  startedAt: number;
+  name: string;
+  sport: Sport;
+  runType?: RunType;
+  distanceM: number;
+  movingS: number;
+  elapsedS?: number;
+  elevationM?: number;
+  avgHr?: number;
+  maxHr?: number;
+  effort?: number; // 1-10, how hard it felt
+  notes?: string;
+  source: "manual" | "strava";
+  stravaId?: number;
+  polyline?: string;
+}
+
 /** A progress photo. Stored resized (about 1600px) plus a small thumbnail for the grid. */
 export interface Photo {
   id?: number;
@@ -85,6 +110,7 @@ class MoveMentDB extends Dexie {
   weights!: Table<BodyWeight, string>;
   settings!: Table<Setting, string>;
   photos!: Table<Photo, number>;
+  activities!: Table<Activity, number>;
 
   constructor() {
     super("movement");
@@ -100,6 +126,8 @@ class MoveMentDB extends Dexie {
     });
     // v2: progress photos. Add new versions below; never edit an earlier one.
     this.version(2).stores({ photos: "++id, date" });
+    // v3: runs and other cardio (manual or from Strava).
+    this.version(3).stores({ activities: "++id, date, startedAt, &stravaId, sport" });
     this.on("populate", (tx) => {
       const starter: Exercise[] = [
         ["Bench press", "weight"], ["Incline dumbbell press", "weight"], ["Overhead press", "weight"],

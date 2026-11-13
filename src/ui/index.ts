@@ -7,3 +7,4 @@ export { ToastHost, toast } from "./Toast";
 export { ConfirmButton } from "./ConfirmButton";
 export { NumInput } from "./NumInput";
 export { LineChart, BarChart, type Point } from "./charts";
+export { RouteShape } from "./RouteShape";
