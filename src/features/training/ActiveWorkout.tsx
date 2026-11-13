@@ -105,12 +105,15 @@ function ExerciseBlock({ ex, sets, unit, workoutId, nextOrder, onDone }: { ex: E
         {!cardio && <span className="h" style={{ textAlign: "center" }}>Last</span>}
         <span className="h" style={{ textAlign: "center" }}>{cardio ? "Min" : bw ? `+${unit}` : unit}</span>
         <span className="h" style={{ textAlign: "center" }}>{cardio ? "Dist" : "Reps"}</span>
-        <span />
         {sets.map((s, i) => {
           const p = prev[i];
           return (
             <div key={s.id} style={{ display: "contents" }} className={s.done ? "setdone" : undefined}>
-              <span className="num muted" style={{ textAlign: "center" }}>{i + 1}</span>
+              {/* Tap the numbered circle to mark the set done; it fills orange with a check. */}
+              <button type="button" className="set-dot" aria-label={`Set ${i + 1} done`} aria-pressed={s.done}
+                onClick={() => { upd(s, { done: !s.done }); if (!s.done) onDone(); }}>
+                {s.done ? <Icon name="check" /> : i + 1}
+              </button>
               {!cardio && <span className="prev">{p ? `${p.weight ?? 0}×${p.reps ?? 0}` : "—"}</span>}
               {cardio ? (
                 <>
@@ -123,10 +126,6 @@ function ExerciseBlock({ ex, sets, unit, workoutId, nextOrder, onDone }: { ex: E
                   <NumInput value={s.reps} onChange={(v) => upd(s, { reps: v })} placeholder={p?.reps?.toString() ?? "0"} />
                 </>
               )}
-              <button type="button" className="check" aria-label={`Set ${i + 1} done`} aria-pressed={s.done}
-                onClick={() => { upd(s, { done: !s.done }); if (!s.done) onDone(); }}>
-                <Icon name="check" />
-              </button>
             </div>
           );
         })}
