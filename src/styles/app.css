@@ -131,18 +131,26 @@ button.row:hover { background: var(--surface); }
 .empty { display: grid; justify-items: center; text-align: center; gap: 6px; padding: 16px 8px; }
 .empty svg { width: 32px; height: 32px; color: var(--faint); }
 
-/* Workout set grid */
-.setgrid { display: grid; grid-template-columns: 40px 1fr 1fr 1fr; gap: 6px; align-items: center; }
-.setgrid .h { font: 600 11px var(--font-text); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
-.setgrid .input { height: 36px; text-align: center; padding: 0 6px; }
-.setgrid .prev { font: 12px var(--font-num); color: var(--faint); text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.setgrid.cardio { grid-template-columns: 40px 1fr 1fr; }
 /* Set circle: orange ring with the set number; tap to fill it orange with a check. */
 .set-dot { width: 36px; height: 36px; border-radius: var(--r-pill); border: 2px solid var(--accent); background: transparent; color: var(--accent); display: grid; place-items: center; cursor: pointer; font: 600 14px var(--font-num); padding: 0; transition: background .15s ease-out, color .15s ease-out, transform .1s ease-out; }
 .set-dot svg { width: 18px; height: 18px; stroke-width: 2.5; }
 .set-dot[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
 .set-dot:active { transform: scale(.92); }
-.setdone .input { color: var(--muted); border-color: transparent; background: transparent; }
+
+/* Workout: one line per set ("240 lb × 6"), tap the numbers to edit. */
+.card.current { border-color: var(--accent); }
+.set-rows { display: grid; }
+.set-row { display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 6px 0; border-top: 1px solid var(--line); }
+.set-row:first-child { border-top: 0; }
+.set-val { background: none; border: 0; padding: 4px 6px; margin-left: -6px; border-radius: 8px; color: var(--fg); font: 600 18px var(--font-num); font-variant-numeric: tabular-nums; cursor: pointer; text-align: left; min-width: 0; }
+.set-val small { font-size: 12px; font-weight: 400; color: var(--muted); margin: 0 6px 0 2px; }
+.set-val:hover { background: var(--surface); }
+.set-row.done .set-val { color: var(--muted); }
+.set-hint { margin-left: auto; font: 12px var(--font-num); color: var(--muted); white-space: nowrap; }
+.set-hint.up { color: var(--success); }
+.set-edit { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0; }
+.set-edit .input { width: 72px; height: 36px; text-align: center; padding: 0 6px; flex: none; }
+.set-edit .btn { margin-left: auto; }
 
 .scanner { position: relative; border-radius: var(--r-card); overflow: hidden; border: 1px solid var(--line); aspect-ratio: 4 / 3; background: var(--surface); max-width: 100%; }
 .scanner video { width: 100%; height: 100%; object-fit: cover; display: block; }

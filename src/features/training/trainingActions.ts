@@ -1,4 +1,4 @@
-import { db, type Routine, type WorkoutSet } from "../../data/db";
+import { db, type Exercise, type Routine, type WorkoutSet } from "../../data/db";
 import { dayKey } from "../../lib/dates";
 import { e1rm } from "../../lib/strength";
 
@@ -62,4 +62,43 @@ export function formatDuration(ms: number) {
   const s = Math.max(0, Math.floor(ms / 1000));
   const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
   return h ? `${h}:${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}` : `${m}:${String(sec).padStart(2, "0")}`;
+}
+
+/* ---------- Editing a workout in progress ---------- */
+
+async function nextOrder(workoutId: number) {
+  const last = await db.sets.where("workoutId").equals(workoutId).sortBy("order");
+  return last.length ? last[last.length - 1].order + 1 : 0;
+}
+
+/** Add an exercise with as many sets as last time (at least 3, or 1 for cardio), pre-filled from last time. */
+export async function addExerciseToWorkout(workoutId: number, ex: Exercise) {
+  const prev = await lastSetsFor(ex.id!, workoutId);
+  const n = Math.max(prev.length, ex.kind === "cardio" ? 1 : 3);
+  let order = await nextOrder(workoutId);
+  for (let i = 0; i < n; i++) {
+    const p = prev[i] || prev[prev.length - 1];
+    await db.sets.add({ workoutId, exerciseId: ex.id!, order: order++, weight: p?.weight, reps: p?.reps, minutes: p?.minutes, distance: p?.distance, done: false });
+  }
+}
+
+/** Add a set that copies the previous one's numbers. */
+export async function addSet(workoutId: number, exerciseId: number, copyFrom?: WorkoutSet) {
+  await db.sets.add({ workoutId, exerciseId, order: await nextOrder(workoutId), weight: copyFrom?.weight, reps: copyFrom?.reps, minutes: copyFrom?.minutes, distance: copyFrom?.distance, done: false });
+}
+
+export function updateSet(id: number, patch: Partial<WorkoutSet>) {
+  return db.sets.update(id, patch);
+}
+
+export function removeSet(id: number) {
+  return db.sets.delete(id);
+}
+
+export function removeExerciseFromWorkout(workoutId: number, exerciseId: number) {
+  return db.sets.where("workoutId").equals(workoutId).filter((s) => s.exerciseId === exerciseId).delete();
+}
+
+export function renameWorkout(id: number, name: string) {
+  return db.workouts.update(id, { name: name.trim() || "Workout" });
 }

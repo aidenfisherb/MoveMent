@@ -4,7 +4,9 @@ import { db, type Exercise, type Workout, type WorkoutSet } from "../../data/db"
 import { useExercises, useSettings } from "../../data/hooks";
 import { ConfirmButton, Icon, NumInput, toast } from "../../ui";
 import { ExercisePicker } from "./ExercisePicker";
-import { deleteWorkout, finishWorkout, formatDuration, lastSetsFor } from "./trainingActions";
+import { fmt } from "../../lib/format";
+import { distUnitFor } from "../../lib/running";
+import { addExerciseToWorkout, addSet, deleteWorkout, finishWorkout, formatDuration, lastSetsFor, removeExerciseFromWorkout, removeSet, renameWorkout, updateSet } from "./trainingActions";
 
 function useNow(interval = 1000) {
   const [now, setNow] = useState(Date.now());
@@ -30,17 +32,12 @@ export function ActiveWorkout({ workout }: { workout: Workout }) {
     return order.map((id) => ({ ex: exercises.find((e) => e.id === id), sets: sets.filter((s) => s.exerciseId === id) }));
   }, [sets, exercises]);
 
-  const nextOrder = () => (sets.length ? Math.max(...sets.map((s) => s.order)) + 1 : 0);
+  // The exercise you're on: the first one with a set left to do.
+  const currentId = groups.find((g) => g.sets.some((s) => !s.done))?.ex?.id;
 
   const addExercise = async (ex: Exercise) => {
     setPicking(false);
-    const prev = await lastSetsFor(ex.id!, workout.id);
-    const n = Math.max(prev.length, ex.kind === "cardio" ? 1 : 3);
-    let order = nextOrder();
-    for (let i = 0; i < n; i++) {
-      const p = prev[i] || prev[prev.length - 1];
-      await db.sets.add({ workoutId: workout.id!, exerciseId: ex.id!, order: order++, weight: p?.weight, reps: p?.reps, minutes: p?.minutes, distance: p?.distance, done: false });
-    }
+    await addExerciseToWorkout(workout.id!, ex);
   };
 
   const finish = async () => {
@@ -55,16 +52,16 @@ export function ActiveWorkout({ workout }: { workout: Workout }) {
     <main className="screen">
       <div className="screen-head">
         <input className="input" style={{ fontWeight: 800, fontSize: 18, background: "transparent", border: 0, padding: 0, height: 32 }} value={name} aria-label="Workout name"
-          onChange={(e) => setName(e.target.value)} onBlur={() => db.workouts.update(workout.id!, { name: name.trim() || "Workout" })} />
+          onChange={(e) => setName(e.target.value)} onBlur={() => renameWorkout(workout.id!, name)} />
         <button className="btn btn-primary btn-sm" type="button" onClick={finish}>Finish</button>
       </div>
       <div className="spread small">
-        <span className="muted">Elapsed <span className="num" style={{ color: "var(--fg)" }}>{formatDuration(now - workout.startedAt)}</span></span>
+        <span className="muted"><span className="num" style={{ color: "var(--fg)" }}>{formatDuration(now - workout.startedAt)}</span> elapsed</span>
         {lastDoneAt && <span className="muted">Rest <span className="num accent">{formatDuration(rest)}</span></span>}
       </div>
 
       {groups.map(({ ex, sets: exSets }) => ex && (
-        <ExerciseBlock key={ex.id} ex={ex} sets={exSets} unit={settings.unit} workoutId={workout.id!} nextOrder={nextOrder} onDone={() => setLastDoneAt(Date.now())} />
+        <ExerciseBlock key={ex.id} ex={ex} sets={exSets} unit={settings.unit} workoutId={workout.id!} current={ex.id === currentId} onDone={() => setLastDoneAt(Date.now())} />
       ))}
 
       {!groups.length && (
@@ -79,60 +76,89 @@ export function ActiveWorkout({ workout }: { workout: Workout }) {
   );
 }
 
-function ExerciseBlock({ ex, sets, unit, workoutId, nextOrder, onDone }: { ex: Exercise; sets: WorkoutSet[]; unit: string; workoutId: number; nextOrder: () => number; onDone: () => void }) {
-  const prev = useLiveQuery(() => lastSetsFor(ex.id!, workoutId), [ex.id, workoutId], []);
-  const cardio = ex.kind === "cardio";
-  const bw = ex.kind === "bodyweight";
-  const upd = (s: WorkoutSet, patch: Partial<WorkoutSet>) => db.sets.update(s.id!, patch);
+/** Weight × reps for display: "240 lb × 6", "BW + 25 × 8", "BW × 10". */
+function setText(s: WorkoutSet, kind: Exercise["kind"], unit: string) {
+  if (kind === "bodyweight") return <>{s.weight ? <>BW + {s.weight}<small>{unit}</small></> : "BW"} × {s.reps ?? "—"}</>;
+  return <>{s.weight ?? "—"}<small>{unit}</small>× {s.reps ?? "—"}</>;
+}
 
-  const addSet = async () => {
-    const last = sets[sets.length - 1];
-    await db.sets.add({ workoutId, exerciseId: ex.id!, order: nextOrder(), weight: last?.weight, reps: last?.reps, minutes: last?.minutes, distance: last?.distance, done: false });
-  };
-  const removeLast = async () => {
-    const last = sets[sets.length - 1];
-    if (last) await db.sets.delete(last.id!);
+/** How this set compares to the same set last session. Weight first, then reps. */
+function diffHint(s: WorkoutSet, p: WorkoutSet | undefined, unit: string) {
+  if (!p) return null;
+  const dw = (s.weight || 0) - (p.weight || 0);
+  if (dw) return <span className={`set-hint${dw > 0 ? " up" : ""}`}>{dw > 0 ? "+" : "−"}{fmt(Math.abs(dw), 1)} {unit}</span>;
+  const dr = (s.reps || 0) - (p.reps || 0);
+  if (dr) return <span className={`set-hint${dr > 0 ? " up" : ""}`}>{dr > 0 ? "+" : "−"}{Math.abs(dr)} rep{Math.abs(dr) === 1 ? "" : "s"}</span>;
+  return null;
+}
+
+function ExerciseBlock({ ex, sets, unit, workoutId, current, onDone }: { ex: Exercise; sets: WorkoutSet[]; unit: string; workoutId: number; current: boolean; onDone: () => void }) {
+  const prev = useLiveQuery(() => lastSetsFor(ex.id!, workoutId), [ex.id, workoutId], []);
+  const settings = useSettings();
+  const cardio = ex.kind === "cardio";
+  const du = distUnitFor(settings.unit);
+  const [editing, setEditing] = useState<number | null>(null);
+  const [menu, setMenu] = useState(false);
+  const best = prev.length ? prev.reduce((a, b) => ((b.weight || 0) * (b.reps || 0) > (a.weight || 0) * (a.reps || 0) ? b : a), prev[0]) : null;
+
+  const toggle = (s: WorkoutSet) => {
+    setEditing(null);
+    updateSet(s.id!, { done: !s.done });
+    if (!s.done) onDone();
   };
 
   return (
-    <section className="card">
+    <section className={`card${current ? " current" : ""}`}>
       <div className="card-head">
         <h2>{ex.name}</h2>
-        <button className="btn icon-btn sm" type="button" aria-label={`Remove last set of ${ex.name}`} onClick={removeLast}><Icon name="minus" /></button>
+        {best && !cardio && <span className="small muted num">Last: {ex.kind === "bodyweight" && !best.weight ? "BW" : `${best.weight ?? 0}`} × {best.reps ?? 0}</span>}
       </div>
-      <div className={`setgrid${cardio ? " cardio" : ""}`}>
-        <span className="h">Set</span>
-        {!cardio && <span className="h" style={{ textAlign: "center" }}>Last</span>}
-        <span className="h" style={{ textAlign: "center" }}>{cardio ? "Min" : bw ? `+${unit}` : unit}</span>
-        <span className="h" style={{ textAlign: "center" }}>{cardio ? "Dist" : "Reps"}</span>
+      <div className="set-rows">
         {sets.map((s, i) => {
-          const p = prev[i];
+          const isEditing = editing === s.id;
           return (
-            <div key={s.id} style={{ display: "contents" }} className={s.done ? "setdone" : undefined}>
-              {/* Tap the numbered circle to mark the set done; it fills orange with a check. */}
-              <button type="button" className="set-dot" aria-label={`Set ${i + 1} done`} aria-pressed={s.done}
-                onClick={() => { upd(s, { done: !s.done }); if (!s.done) onDone(); }}>
+            <div key={s.id} className={`set-row${s.done ? " done" : ""}`}>
+              <button type="button" className="set-dot" aria-label={`Set ${i + 1} done`} aria-pressed={s.done} onClick={() => toggle(s)}>
                 {s.done ? <Icon name="check" /> : i + 1}
               </button>
-              {!cardio && <span className="prev">{p ? `${p.weight ?? 0}×${p.reps ?? 0}` : "—"}</span>}
-              {cardio ? (
-                <>
-                  <NumInput value={s.minutes} onChange={(v) => upd(s, { minutes: v })} placeholder="0" />
-                  <NumInput value={s.distance} onChange={(v) => upd(s, { distance: v })} placeholder="0" />
-                </>
+              {isEditing ? (
+                <div className="set-edit" onKeyDown={(e) => e.key === "Enter" && setEditing(null)}>
+                  {cardio ? (
+                    <>
+                      <NumInput value={s.minutes} onChange={(v) => updateSet(s.id!, { minutes: v })} placeholder="0" /><span className="muted">min</span>
+                      <NumInput value={s.distance} onChange={(v) => updateSet(s.id!, { distance: v })} placeholder="0" /><span className="muted">{du}</span>
+                    </>
+                  ) : (
+                    <>
+                      <NumInput value={s.weight} onChange={(v) => updateSet(s.id!, { weight: v })} placeholder={ex.kind === "bodyweight" ? "+0" : "0"} /><span className="muted">{unit}</span>
+                      <span className="muted">×</span>
+                      <NumInput value={s.reps} onChange={(v) => updateSet(s.id!, { reps: v })} placeholder="0" />
+                    </>
+                  )}
+                  <button type="button" className="btn btn-sm" onClick={() => setEditing(null)}>Done</button>
+                </div>
               ) : (
                 <>
-                  <NumInput value={s.weight} onChange={(v) => upd(s, { weight: v })} placeholder={bw ? "0" : p?.weight?.toString() ?? "0"} />
-                  <NumInput value={s.reps} onChange={(v) => upd(s, { reps: v })} placeholder={p?.reps?.toString() ?? "0"} />
+                  <button type="button" className="set-val" aria-label={`Edit set ${i + 1}`} onClick={() => setEditing(s.id!)}>
+                    {cardio ? <>{s.minutes ?? "—"}<small>min</small>· {s.distance ?? "—"}<small>{du}</small></> : setText(s, ex.kind, unit)}
+                  </button>
+                  {!cardio && diffHint(s, prev[i], unit)}
                 </>
               )}
             </div>
           );
         })}
       </div>
-      <button className="btn btn-sm" type="button" onClick={addSet}><Icon name="plus" />Add set</button>
+      <div className="spread">
+        <button className="btn btn-sm" type="button" onClick={() => addSet(workoutId, ex.id!, sets[sets.length - 1])}><Icon name="plus" />Set</button>
+        <button className="btn btn-ghost icon-btn sm" type="button" aria-label={`More options for ${ex.name}`} aria-expanded={menu} onClick={() => setMenu(!menu)}><Icon name="more" /></button>
+      </div>
+      {menu && (
+        <div className="row-gap" style={{ justifyContent: "flex-end" }}>
+          <button className="btn btn-sm" type="button" disabled={!sets.length} onClick={() => { removeSet(sets[sets.length - 1].id!); setMenu(false); }}>Remove last set</button>
+          <ConfirmButton label="Remove exercise" confirmLabel="Tap to remove" className="btn btn-sm btn-danger" onConfirm={() => removeExerciseFromWorkout(workoutId, ex.id!)} />
+        </div>
+      )}
     </section>
   );
 }
-
-/* ---------------- Exercise picker ---------------- */
