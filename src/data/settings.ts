@@ -8,7 +8,18 @@ export interface Settings {
   lastPhotoBackup?: number;
   name?: string;
   heightCm?: number;
+  /** Strava connection. Secrets and tokens are never included in backups. */
+  stravaClientId?: string;
+  stravaClientSecret?: string;
+  stravaRefreshToken?: string;
+  stravaAccessToken?: string;
+  stravaExpiresAt?: number;
+  stravaAthlete?: string;
+  stravaLastSync?: number;
 }
+
+/** Settings keys that must never leave the device (excluded from backup files). */
+export const PRIVATE_SETTING_KEYS = ["stravaClientSecret", "stravaRefreshToken", "stravaAccessToken", "stravaExpiresAt"];
 
 export const DEFAULT_SETTINGS: Settings = {
   targets: { kcal: 2400, p: 180, c: 260, f: 70 },

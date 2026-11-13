@@ -83,6 +83,65 @@ async function seed() {
   await db.settings.put({ key: "previewSeeded", value: true });
 }
 
+/** Encode [lat, lng] points as a Google polyline (the format Strava uses). */
+function encode(points: [number, number][]) {
+  let out = "", pl = 0, pg = 0;
+  const enc = (v: number) => {
+    let n = v < 0 ? ~(v << 1) : v << 1, s = "";
+    while (n >= 0x20) { s += String.fromCharCode((0x20 | (n & 0x1f)) + 63); n >>= 5; }
+    return s + String.fromCharCode(n + 63);
+  };
+  for (const [lat, lng] of points) {
+    const a = Math.round(lat * 1e5), b = Math.round(lng * 1e5);
+    out += enc(a - pl) + enc(b - pg); pl = a; pg = b;
+  }
+  return out;
+}
+
+function loop(seedN: number, km: number): [number, number][] {
+  const pts: [number, number][] = [];
+  const r = km / 2 / Math.PI / 111;
+  for (let i = 0; i <= 80; i++) {
+    const t = (i / 80) * Math.PI * 2;
+    const wob = 1 + 0.18 * Math.sin(t * 3 + seedN) + 0.08 * Math.cos(t * 7 + seedN);
+    pts.push([40.0 + r * wob * Math.sin(t), -105.27 + (r * wob * Math.cos(t)) / 0.77]);
+  }
+  return pts;
+}
+
+async function seedRuns() {
+  if (await db.settings.get("previewRunsSeeded")) return;
+  const plan: [number, "easy" | "long" | "workout" | "race", number, number][] = [];
+  // [days ago, type, miles, pace min/mi]
+  for (let w = 0; w < 6; w++) {
+    const base = w * 7;
+    plan.push([base + 1, "easy", 4 + rand(w) * 1.5, 8.9 - w * -0.03]);
+    plan.push([base + 3, "workout", 5, 7.6 + w * 0.04]);
+    plan.push([base + 5, "easy", 3.5 + rand(w + 9), 9.1]);
+    plan.push([base + 6, "long", 8 + (5 - w) * 0.5, 8.7 + w * 0.05]);
+  }
+  plan.push([12, "race", 3.11, 7.05]);
+  let n = 0;
+  for (const [ago, runType, mi, pace] of plan) {
+    if (ago < 1) continue;
+    const date = addDays(today, -ago);
+    const distanceM = mi * 1609.344;
+    const movingS = Math.round(mi * pace * 60 * (0.98 + rand(ago) * 0.04));
+    const fromStrava = n++ % 3 !== 2;
+    await db.activities.add({
+      date, startedAt: new Date(`${date}T06:45:00`).getTime(),
+      name: fromStrava ? ({ easy: "Morning Run", long: "Long run", workout: "Tempo 3 x 1 mi", race: "Turkey Trot 5K" } as const)[runType] : `${runType[0].toUpperCase()}${runType.slice(1)} run`,
+      sport: "run", runType, distanceM, movingS, elapsedS: movingS + 120,
+      elevationM: Math.round(20 + rand(ago * 3) * 80), avgHr: fromStrava ? Math.round(140 + (runType === "workout" || runType === "race" ? 25 : 0) + rand(ago) * 8) : undefined,
+      source: fromStrava ? "strava" : "manual", stravaId: fromStrava ? 9000000 + n : undefined,
+      polyline: fromStrava ? encode(loop(ago, mi * 1.609)) : undefined,
+      effort: fromStrava ? undefined : 5
+    });
+  }
+  await db.settings.put({ key: "previewRunsSeeded", value: true });
+}
+
 seed()
+  .then(seedRuns)
   .catch((e) => console.error("Preview seed failed", e))
   .finally(() => import("../src/main"));

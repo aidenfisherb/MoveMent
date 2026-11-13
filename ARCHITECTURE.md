@@ -16,13 +16,14 @@ flowchart LR
   pages -- "first load + updates" --> sw
   app -- "food search / barcode" --> off["Open Food Facts API"]
   app -- "food search" --> usda["USDA FoodData Central API"]
+  app -- "sync runs (your own API app)" --> strava["Strava API"]
   app -- "Back up / Restore" --> files["iCloud Drive / Files<br/>(JSON backup)"]
 ```
 
 - **GitHub Pages** only serves files. It never sees your data.
 - The **service worker** caches the app so it opens offline and loads instantly.
 - **IndexedDB** (through the Dexie library) is the database. It lives on the phone only.
-- The only network calls are the two free food databases. Everything else works offline.
+- The only network calls are the two free food databases and, once connected, your own Strava API app. Everything else works offline.
 
 ## 2. Layers
 
@@ -143,6 +144,16 @@ erDiagram
   WEIGHTS {
     string date
     float weight
+  }
+  ACTIVITIES {
+    int id
+    string date
+    string sport
+    string runType
+    float distanceM
+    int movingS
+    int stravaId
+    string polyline
   }
   PHOTOS {
     int id
