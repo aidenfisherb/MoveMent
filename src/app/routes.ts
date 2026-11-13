@@ -9,3 +9,13 @@ export const TABS: { id: Route; label: string; icon: string }[] = [
   { id: "train", label: "Train", icon: "dumbbell" },
   { id: "progress", label: "Progress", icon: "chart" }
 ];
+
+// The URL uses "#prefs" for Settings: "#settings" is reserved when the app is previewed inside claude.ai.
+const HASH: Partial<Record<Route, string>> = { settings: "prefs" };
+
+export const hashFor = (r: Route) => HASH[r] ?? r;
+
+export function routeFromHash(h: string): Route {
+  const match = ROUTES.find((r) => hashFor(r) === h);
+  return match ?? "today";
+}
