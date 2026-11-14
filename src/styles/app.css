@@ -215,3 +215,5 @@ a.btn { text-decoration: none; }
 /* Routine share card preview */
 .share-preview { border: 1px solid var(--line); border-radius: var(--r-card); background: var(--surface); min-height: 160px; display: grid; place-items: center; overflow: hidden; }
 .share-preview img { width: 100%; height: auto; display: block; -webkit-touch-callout: default; }
+
+.code-box { display: block; font: 600 14px/1.4 var(--font-num); word-break: break-all; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-input); padding: 10px 12px; user-select: all; -webkit-user-select: all; }

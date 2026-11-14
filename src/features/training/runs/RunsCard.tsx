@@ -56,9 +56,9 @@ export function RunsCard() {
 
   // Coming back from Strava's approval page with a code waiting: reopen setup to finish.
   useEffect(() => {
-    if (s.stravaRefreshToken || !s.stravaClientId) return;
+    if (s.stravaRefreshToken) return;
     try { if (localStorage.getItem(PENDING_CODE_KEY)) setStrava(true); } catch { /* storage blocked */ }
-  }, [s.stravaRefreshToken, s.stravaClientId]);
+  }, [s.stravaRefreshToken]);
 
   return (
     <section className="card">
