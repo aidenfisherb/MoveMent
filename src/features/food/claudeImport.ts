@@ -12,6 +12,8 @@
  *   carbs: 82
  *   fat: 26
  *
+ * Several foods go in the same block, separated by a line of three dashes (---).
+ *
  * It also copes with ordinary replies ("Total: ~780 calories, 48 g protein…"),
  * taking the last value mentioned for each field, since totals usually come last.
  */
@@ -39,11 +41,28 @@ function lastMatch(text: string, re: RegExp) {
   return hit ? toNum(hit[1], hit[2]) : undefined;
 }
 
-export function parseClaudeReply(raw: string): Estimate | null {
-  if (!raw?.trim()) return null;
-  // If the skill's block is present, only read from it.
-  const block = raw.match(/MOVEMENT\s*\n([\s\S]*?)(?:```|\n\s*\n\s*\n|$)/i);
-  const text = (block ? block[1] : raw)
+/**
+ * Read every food in a reply. The skill puts one food per entry inside a single
+ * MOVEMENT block, separated by lines of "---", so one copy grabs them all.
+ * Replies without a block are read as a single food.
+ */
+export function parseClaudeReplies(raw: string): Estimate[] {
+  if (!raw?.trim()) return [];
+  const block = raw.match(/MOVEMENT[ \t]*\r?\n([\s\S]*?)(?:```|$)/i);
+  if (!block) {
+    const one = parseOne(raw, raw);
+    return one ? [one] : [];
+  }
+  return block[1]
+    .split(/^\s*-{3,}\s*$/m)
+    .map((chunk) => chunk.trim())
+    .filter(Boolean)
+    .map((chunk) => parseOne(chunk, chunk))
+    .filter((e): e is Estimate => !!e);
+}
+
+function parseOne(source: string, raw: string): Estimate | null {
+  const text = source
     .replace(/\*\*/g, "")
     // Ignore saturated/trans fat lines so they aren't read as total fat.
     .replace(/(?:saturated|trans)\s+fats?[^\n]*/gi, "");

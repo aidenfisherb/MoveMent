@@ -11,6 +11,7 @@ import { RoutineEditor } from "./RoutineEditor";
 import { startWorkout } from "./trainingActions";
 import { activityLabel, RunDetailSheet } from "./runs/RunSheets";
 import { RunsCard } from "./runs/RunsCard";
+import { ShareRoutinesSheet } from "./share/ShareRoutinesSheet";
 import { WorkoutDetail } from "./WorkoutDetail";
 
 export default function TrainScreen() {
@@ -46,6 +47,7 @@ function TrainHome() {
   const [editing, setEditing] = useState<Routine | "new" | null>(null);
   const [viewing, setViewing] = useState<Workout | null>(null);
   const [viewingRun, setViewingRun] = useState<Activity | null>(null);
+  const [sharing, setSharing] = useState(false);
   const settings = useSettings();
   const u = distUnitFor(settings.unit);
   const activities = useLiveQuery(() => db.activities.orderBy("startedAt").reverse().limit(30).toArray(), [], []);
@@ -66,7 +68,10 @@ function TrainHome() {
       <section className="card">
         <div className="card-head">
           <h2>Routines</h2>
-          <button className="btn btn-sm" type="button" onClick={() => setEditing("new")}><Icon name="plus" />New</button>
+          <div className="row-gap">
+            {routines.length > 0 && <button className="btn btn-sm" type="button" onClick={() => setSharing(true)}><Icon name="upload" />Share</button>}
+            <button className="btn btn-sm" type="button" onClick={() => setEditing("new")}><Icon name="plus" />New</button>
+          </div>
         </div>
         {routines.length ? (
           <div className="rows">
@@ -113,6 +118,7 @@ function TrainHome() {
 
       {editing && <RoutineEditor routine={editing === "new" ? undefined : editing} onClose={() => setEditing(null)} />}
       {viewing && <WorkoutDetail workout={viewing} onClose={() => setViewing(null)} />}
+      {sharing && <ShareRoutinesSheet routines={routines} exercises={exercises} onClose={() => setSharing(false)} />}
       {viewingRun && <RunDetailSheet activity={viewingRun} onClose={() => setViewingRun(null)} />}
     </main>
   );
