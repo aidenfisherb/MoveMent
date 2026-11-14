@@ -7,6 +7,10 @@ import { authorizeUrl, callbackUrl, extractCode } from "./stravaApi";
 /** Key the strava.html callback page uses to hand the code over when it shares storage with the app. */
 export const PENDING_CODE_KEY = "movement.stravaCode";
 
+export function peekPendingCode(): string | null {
+  try { return localStorage.getItem(PENDING_CODE_KEY); } catch { return null; }
+}
+
 export function takePendingCode(): string | null {
   try {
     const c = localStorage.getItem(PENDING_CODE_KEY);
@@ -26,6 +30,8 @@ export function StravaSheet({ onClose }: { onClose: () => void }) {
   const [busy, setBusy] = useState<"" | "connect" | "sync">("");
   const [error, setError] = useState("");
   const hasApp = !!s.stravaClientId && !!s.stravaClientSecret;
+  // A code arrived in a copy of the app that doesn't have the keys (e.g. a Safari window): show it to copy.
+  const strandedCode = !connected && !hasApp ? peekPendingCode() : null;
 
   useEffect(() => { setId(s.stravaClientId ?? ""); setSecret(s.stravaClientSecret ?? ""); }, [s.stravaClientId, s.stravaClientSecret]);
 
@@ -84,6 +90,17 @@ export function StravaSheet({ onClose }: { onClose: () => void }) {
 
   return (
     <Sheet open onClose={onClose} tall title="Connect Strava">
+      {strandedCode && (
+        <div className="card" style={{ borderColor: "var(--accent)" }}>
+          <span className="label" style={{ color: "var(--accent)" }}>Strava sent your code here</span>
+          <p className="small muted">This window doesn't have your Strava keys. Copy the code, then open MoveMent from your Home Screen and paste it in Step 3.</p>
+          <code className="code-box">{strandedCode}</code>
+          <button className="btn btn-primary" type="button" onClick={async () => {
+            try { await navigator.clipboard.writeText(strandedCode); toast("Code copied. Now open MoveMent from your Home Screen."); }
+            catch { toast("Press and hold the code to copy it.", { error: true }); }
+          }}><Icon name="paste" />Copy code</button>
+        </div>
+      )}
       <span className="small muted">One-time setup, about 5 minutes. Your keys stay on this phone and are left out of backups.</span>
 
       <div className="card">

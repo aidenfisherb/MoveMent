@@ -9,6 +9,8 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "autoUpdate",
+      // The Strava approval page must load as itself, not as the app shell.
+      workbox: { navigateFallbackDenylist: [/strava\.html/] },
       includeAssets: ["icon.svg", "apple-touch-icon.png"],
       manifest: {
         name: "MoveMent",

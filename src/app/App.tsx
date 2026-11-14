@@ -5,9 +5,13 @@ import FoodScreen from "../features/food/FoodScreen";
 import TrainScreen from "../features/training/TrainScreen";
 import ProgressScreen from "../features/progress/ProgressScreen";
 import SettingsScreen from "../features/settings/SettingsScreen";
+import { captureStravaRedirect } from "../features/training/runs/stravaRedirect";
 import { hashFor, routeFromHash, TABS, type Route } from "./routes";
 
-const readHash = (): Route => routeFromHash(location.hash.slice(1));
+// Strava's approval can land on the app itself (iPhone Home Screen apps); pick the code up before routing.
+const fromStrava = captureStravaRedirect();
+
+const readHash = (): Route => (fromStrava ? "train" : routeFromHash(location.hash.slice(1)));
 
 export default function App() {
   const [route, setRoute] = useState<Route>(readHash);
