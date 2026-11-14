@@ -11,6 +11,7 @@ import { RoutineEditor } from "./RoutineEditor";
 import { startWorkout } from "./trainingActions";
 import { activityLabel, RunDetailSheet } from "./runs/RunSheets";
 import { RunsCard } from "./runs/RunsCard";
+import { ShareRoutineSheet } from "./share/ShareRoutineSheet";
 import { WorkoutDetail } from "./WorkoutDetail";
 
 export default function TrainScreen() {
@@ -46,6 +47,7 @@ function TrainHome() {
   const [editing, setEditing] = useState<Routine | "new" | null>(null);
   const [viewing, setViewing] = useState<Workout | null>(null);
   const [viewingRun, setViewingRun] = useState<Activity | null>(null);
+  const [sharing, setSharing] = useState<Routine | null>(null);
   const settings = useSettings();
   const u = distUnitFor(settings.unit);
   const activities = useLiveQuery(() => db.activities.orderBy("startedAt").reverse().limit(30).toArray(), [], []);
@@ -66,16 +68,19 @@ function TrainHome() {
       <section className="card">
         <div className="card-head">
           <h2>Routines</h2>
-          <button className="btn btn-sm" type="button" onClick={() => setEditing("new")}><Icon name="plus" />New</button>
+          <div className="row-gap">
+            <button className="btn btn-sm" type="button" onClick={() => setEditing("new")}><Icon name="plus" />New</button>
+          </div>
         </div>
         {routines.length ? (
           <div className="rows">
             {routines.map((r) => (
-              <div key={r.id} className="row" style={{ gridTemplateColumns: "1fr auto auto" }}>
+              <div key={r.id} className="row" style={{ gridTemplateColumns: "1fr auto auto auto" }}>
                 <span className="name">{r.name}</span>
                 <span className="sub">{r.items.map((i) => exName(i.exerciseId)).join(", ") || "No exercises"}</span>
-                <button className="btn icon-btn sm" type="button" aria-label={`Edit ${r.name}`} style={{ gridRow: "1 / span 2", gridColumn: 2 }} onClick={() => setEditing(r)}><Icon name="edit" /></button>
-                <button className="btn btn-primary btn-sm" type="button" style={{ gridRow: "1 / span 2", gridColumn: 3 }} onClick={() => startWorkout(r)}>Start</button>
+                <button className="btn icon-btn sm" type="button" aria-label={`Share ${r.name}`} style={{ gridRow: "1 / span 2", gridColumn: 2 }} onClick={() => setSharing(r)}><Icon name="share" /></button>
+                <button className="btn icon-btn sm" type="button" aria-label={`Edit ${r.name}`} style={{ gridRow: "1 / span 2", gridColumn: 3 }} onClick={() => setEditing(r)}><Icon name="edit" /></button>
+                <button className="btn btn-primary btn-sm" type="button" style={{ gridRow: "1 / span 2", gridColumn: 4 }} onClick={() => startWorkout(r)}>Start</button>
               </div>
             ))}
           </div>
@@ -113,6 +118,7 @@ function TrainHome() {
 
       {editing && <RoutineEditor routine={editing === "new" ? undefined : editing} onClose={() => setEditing(null)} />}
       {viewing && <WorkoutDetail workout={viewing} onClose={() => setViewing(null)} />}
+      {sharing && <ShareRoutineSheet routine={sharing} exercises={exercises} onClose={() => setSharing(null)} />}
       {viewingRun && <RunDetailSheet activity={viewingRun} onClose={() => setViewingRun(null)} />}
     </main>
   );

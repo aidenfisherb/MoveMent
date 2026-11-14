@@ -1,0 +1,199 @@
+<title>Incomplete Day Flag</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Manrope:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: four phone mockups showing where the "incomplete day" label could live, wrapping on small screens. Single dark look from the personal UI style. */
+:root {
+  --bg:#000; --surface:#0E0F11; --surface-2:#17181B; --line:#2A2C31; --line-strong:#3A3D44;
+  --fg:#F2F2F2; --muted:#8B8E96; --faint:#5A5D64; --accent:#FF5A1F; --accent-dim:rgba(255,90,31,.14); --on-accent:#000;
+  --success:#3DDC84; --warning:#FFC233; --grid:#1A1B1E;
+  --font-text:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-num:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  color-scheme: dark;
+}
+* { box-sizing:border-box; }
+body { background:var(--bg); color:var(--fg); font:400 14px/1.5 var(--font-text); -webkit-font-smoothing:antialiased; margin:0; }
+.page { max-width:1640px; margin:0 auto; padding-block:28px 64px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); display:grid; gap:24px; }
+h1 { margin:0; font-weight:800; font-size:26px; letter-spacing:-.01em; text-wrap:balance; }
+.lead { margin:0; color:var(--muted); max-width:72ch; }
+.label { font:600 10.5px/1.2 var(--font-text); text-transform:uppercase; letter-spacing:.08em; color:var(--muted); }
+.options { display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%, 360px), 1fr)); gap:28px; align-items:start; }
+.opt { display:grid; gap:12px; min-width:0; }
+.opt header { display:grid; gap:4px; }
+.opt header b { font-weight:800; font-size:17px; }
+.opt header b span { color:var(--accent); font-family:var(--font-num); font-size:14px; margin-right:6px; }
+.opt header p { margin:0; color:var(--muted); font-size:13px; }
+.why { margin:0; padding-left:18px; color:var(--muted); font-size:12.5px; display:grid; gap:2px; }
+.phone { width:100%; max-width:380px; border:1px solid var(--line-strong); border-radius:30px; overflow:hidden; background:var(--bg); justify-self:center; }
+.scr { padding:16px 14px 14px; display:grid; gap:10px; }
+.num { font-family:var(--font-num); font-variant-numeric:tabular-nums; }
+.muted { color:var(--muted); } .faint { color:var(--faint); } .small { font-size:11.5px; }
+.spread { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+.card { border:1px solid var(--line); border-radius:10px; padding:11px; display:grid; gap:8px; }
+.h1 { font-weight:800; font-size:21px; letter-spacing:-.01em; }
+.h2 { font-weight:800; font-size:15px; }
+svg.i { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; flex:none; }
+.ib { width:32px; height:32px; border-radius:50%; border:1px solid var(--line); display:grid; place-items:center; color:var(--fg); }
+.ib.dim { opacity:.4; }
+.macro4 { display:grid; grid-template-columns:repeat(4,1fr); text-align:center; gap:4px; }
+.macro4 b { font:600 15px var(--font-num); display:block; }
+.macro4 b.k { color:var(--accent); }
+.meal { border:1px solid var(--line); border-radius:10px; padding:9px 11px; display:grid; gap:4px; }
+.meal .rowx { display:flex; justify-content:space-between; font-size:12.5px; }
+.meal .rowx span:last-child { font:12px var(--font-num); }
+.meal.empty { border-style:dashed; }
+.meal.empty .h2 { color:var(--muted); }
+.add { width:26px; height:26px; border-radius:50%; border:1px solid var(--line); display:grid; place-items:center; color:var(--fg); }
+.add svg { width:14px; height:14px; }
+
+/* The flag itself */
+.flag { display:inline-flex; align-items:center; gap:5px; height:24px; padding:0 9px 0 7px; border-radius:999px; border:1px solid rgba(255,194,51,.5); color:var(--warning); font:600 11px var(--font-text); white-space:nowrap; }
+.flag svg { width:13px; height:13px; }
+.flag .x { margin-left:2px; opacity:.7; }
+.tip { border:1px solid var(--line); border-radius:10px; padding:8px 10px; font-size:11.5px; color:var(--muted); display:flex; justify-content:space-between; gap:8px; align-items:center; background:var(--surface); }
+.tip b { color:var(--fg); font-weight:600; }
+.link { color:var(--accent); font-weight:700; font-size:11.5px; white-space:nowrap; }
+
+/* Option 2 chart */
+.chart svg { width:100%; height:auto; display:block; }
+.chart text { font:10px var(--font-num); fill:var(--muted); }
+
+/* Option 3 week strip */
+.wk { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; text-align:center; }
+.wk div { display:grid; gap:4px; justify-items:center; font:600 10.5px var(--font-text); color:var(--muted); }
+.wk .d { width:32px; height:32px; border-radius:50%; display:grid; place-items:center; font:600 11px var(--font-num); color:var(--fg); border:1px solid var(--line); }
+.wk .ok .d { background:var(--surface-2); }
+.wk .ok i, .wk .bad i, .wk .none i { width:6px; height:6px; border-radius:50%; display:block; }
+.wk .ok i { background:var(--success); }
+.wk .bad .d { border:2px solid var(--warning); color:var(--warning); }
+.wk .bad i { background:var(--warning); }
+.wk .none i { background:transparent; border:1px solid var(--line-strong); }
+.wk .sel .d { outline:2px solid var(--fg); outline-offset:2px; }
+.wk .today .d { background:var(--accent); color:var(--on-accent); border-color:var(--accent); }
+.wk .today i { background:transparent; }
+
+/* Option 4 streak */
+.streak { display:grid; grid-template-columns:auto 1fr; gap:12px; align-items:center; }
+.streak .big { font:700 30px/1 var(--font-num); }
+.streak .big small { font-size:14px; color:var(--muted); font-weight:400; }
+.cells { display:grid; grid-template-columns:repeat(14,1fr); gap:3px; }
+.cells i { height:18px; border-radius:4px; background:var(--accent); }
+.cells i.b { background:transparent; border:1.5px solid var(--warning); }
+.cells i.n { background:var(--line); }
+.cells i.t { background:var(--surface-2); border:1px dashed var(--line-strong); }
+.dials { display:grid; grid-template-columns:repeat(3,1fr); text-align:center; gap:6px; }
+.dials svg { width:62px; height:62px; display:block; margin:0 auto; }
+.dials text { font:600 18px var(--font-num); fill:var(--fg); }
+.dials span { font:600 10px var(--font-text); letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+.display { font:600 34px/1 var(--font-num); color:var(--accent); }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="left" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+  <symbol id="right" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+  <symbol id="plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="flag" viewBox="0 0 24 24"><path d="M5 21V4h11l-2 4 2 4H5"/></symbol>
+  <symbol id="x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></symbol>
+</svg>
+
+<main class="page">
+  <header style="display:grid;gap:8px">
+    <span class="label">MoveMent · incomplete days</span>
+    <h1>Where should the “incomplete” label go?</h1>
+    <p class="lead">A past day gets the label when lunch or dinner has nothing logged, and you can clear it with a tap. It's information only: no numbers change and nothing asks you to fill the day in. The example day is Wed, Nov 11, with only breakfast and a snack logged. Pick any combination.</p>
+  </header>
+
+  <section class="options">
+    <!-- 1 -->
+    <article class="opt">
+      <header><b><span>1</span>Next to the date on Food</b><p>A small yellow chip beside the day's name. Tap it to see why it's flagged and clear it.</p></header>
+      <div class="phone"><div class="scr">
+        <div class="spread"><span class="ib"><svg class="i"><use href="#left"/></svg></span><div style="display:grid;justify-items:center;gap:4px"><span class="h1">Wed, Nov 11</span><span class="flag"><svg class="i"><use href="#flag"/></svg>Incomplete</span></div><span class="ib"><svg class="i"><use href="#right"/></svg></span></div>
+        <div class="tip"><span>No lunch or dinner logged.</span><span class="link">Mark complete</span></div>
+        <div class="card"><div class="macro4"><div><span class="label">kcal</span><b class="k">740</b><span class="small muted num">/ 2,400</span></div><div><span class="label">Protein</span><b>46</b><span class="small muted num">/ 180g</span></div><div><span class="label">Carbs</span><b>98</b><span class="small muted num">/ 260g</span></div><div><span class="label">Fat</span><b>17</b><span class="small muted num">/ 70g</span></div></div></div>
+        <div class="meal"><div class="spread"><span class="h2">Breakfast</span><span class="add"><svg class="i"><use href="#plus"/></svg></span></div><div class="rowx"><span>Greek yogurt, 2%</span><span>146</span></div><div class="rowx"><span>Rolled oats</span><span>152</span></div><div class="rowx"><span>Banana</span><span>105</span></div></div>
+        <div class="meal empty"><div class="spread"><span class="h2">Lunch</span><span class="add"><svg class="i"><use href="#plus"/></svg></span></div></div>
+        <div class="meal empty"><div class="spread"><span class="h2">Dinner</span><span class="add"><svg class="i"><use href="#plus"/></svg></span></div></div>
+        <div class="meal"><div class="spread"><span class="h2">Snack</span><span class="add"><svg class="i"><use href="#plus"/></svg></span></div><div class="rowx"><span>Protein bar</span><span>220</span></div></div>
+      </div></div>
+      <ul class="why"><li>Only shows when you're looking at that day</li><li>The tip line opens when you tap the chip</li></ul>
+    </article>
+
+    <!-- 2 -->
+    <article class="opt">
+      <header><b><span>2</span>On the Progress calorie chart</b><p>Incomplete days are drawn as hollow yellow bars, with a note under the chart. Averages stay exactly as they are.</p></header>
+      <div class="phone"><div class="scr">
+        <span class="h1">Progress</span>
+        <div class="card">
+          <span class="h2">Calories, last 14 days</span>
+          <div class="chart">
+            <svg viewBox="0 0 340 150" role="img" aria-label="Daily calories for 14 days; Nov 4 and Nov 11 are hollow because they are incomplete">
+              <line x1="36" x2="334" y1="20" y2="20" stroke="#1A1B1E"/><line x1="36" x2="334" y1="68" y2="68" stroke="#1A1B1E"/><line x1="36" x2="334" y1="116" y2="116" stroke="#1A1B1E"/>
+              <text x="30" y="23" text-anchor="end">3k</text><text x="30" y="71" text-anchor="end">1.5k</text><text x="30" y="119" text-anchor="end">0</text>
+              <line x1="36" x2="334" y1="39" y2="39" stroke="#F2F2F2" stroke-dasharray="3 4" opacity=".6"/>
+              <g fill="#FF5A1F">
+                <rect x="42" y="44" width="13" height="72" rx="2"/><rect x="63" y="38" width="13" height="78" rx="2"/><rect x="84" y="47" width="13" height="69" rx="2"/>
+                <rect x="126" y="41" width="13" height="75" rx="2"/><rect x="147" y="36" width="13" height="80" rx="2"/><rect x="168" y="50" width="13" height="66" rx="2"/>
+                <rect x="189" y="43" width="13" height="73" rx="2"/><rect x="210" y="40" width="13" height="76" rx="2"/><rect x="231" y="45" width="13" height="71" rx="2"/>
+                <rect x="273" y="39" width="13" height="77" rx="2"/><rect x="294" y="42" width="13" height="74" rx="2"/><rect x="315" y="70" width="13" height="46" rx="2" opacity=".55"/>
+              </g>
+              <rect x="105.75" y="86.75" width="11.5" height="28.5" rx="2" fill="none" stroke="#FFC233" stroke-width="1.5"/>
+              <rect x="252.75" y="92.75" width="11.5" height="22.5" rx="2" fill="none" stroke="#FFC233" stroke-width="1.5"/>
+              <text x="111.5" y="81" text-anchor="middle" style="fill:#FFC233">!</text><text x="258.5" y="87" text-anchor="middle" style="fill:#FFC233">!</text>
+              <text x="48" y="140" text-anchor="middle">S</text><text x="111" y="140" text-anchor="middle">W</text><text x="174" y="140" text-anchor="middle">S</text><text x="237" y="140" text-anchor="middle">T</text><text x="300" y="140" text-anchor="middle">F</text>
+            </svg>
+          </div>
+          <div class="tip"><span><b>2 of 14 days</b> incomplete (Nov 4, Nov 11). Tap a hollow bar to clear it.</span></div>
+          <div class="macro4"><div><span class="label">Avg kcal</span><b>2,190</b></div><div><span class="label">Protein</span><b>158g</b></div><div><span class="label">Carbs</span><b>231g</b></div><div><span class="label">Fat</span><b>66g</b></div></div>
+        </div>
+      </div></div>
+      <ul class="why"><li>Explains why some bars are low</li><li>Today's bar stays faded until the day is over</li></ul>
+    </article>
+
+    <!-- 3 -->
+    <article class="opt">
+      <header><b><span>3</span>Week strip on Food</b><p>Seven days above the meals. A green dot means fully logged and a yellow ring means incomplete. Tap a day to jump to it.</p></header>
+      <div class="phone"><div class="scr">
+        <div class="spread"><span class="h1">Food</span><span class="small muted">This week</span></div>
+        <div class="wk">
+          <div class="ok">M<span class="d">9</span><i></i></div><div class="ok">T<span class="d">10</span><i></i></div><div class="bad sel">W<span class="d">11</span><i></i></div>
+          <div class="ok">T<span class="d">12</span><i></i></div><div class="ok">F<span class="d">13</span><i></i></div><div class="today">S<span class="d">14</span><i></i></div><div class="none">S<span class="d" style="opacity:.4">15</span><i></i></div>
+        </div>
+        <div class="tip"><span><b>Wed, Nov 11</b> · no lunch or dinner logged</span><span class="link">Mark complete</span></div>
+        <div class="card"><div class="macro4"><div><span class="label">kcal</span><b class="k">740</b></div><div><span class="label">Protein</span><b>46</b></div><div><span class="label">Carbs</span><b>98</b></div><div><span class="label">Fat</span><b>17</b></div></div></div>
+        <div class="meal"><div class="spread"><span class="h2">Breakfast</span><span class="add"><svg class="i"><use href="#plus"/></svg></span></div><div class="rowx"><span>Greek yogurt · Oats · Banana</span><span>403</span></div></div>
+        <div class="meal empty"><div class="spread"><span class="h2">Lunch</span><span class="add"><svg class="i"><use href="#plus"/></svg></span></div></div>
+        <div class="meal empty"><div class="spread"><span class="h2">Dinner</span><span class="add"><svg class="i"><use href="#plus"/></svg></span></div></div>
+      </div></div>
+      <ul class="why"><li>Shows your logging consistency for the whole week</li><li>Also replaces the ‹ › arrows for moving between days</li></ul>
+    </article>
+
+    <!-- 4 -->
+    <article class="opt">
+      <header><b><span>4</span>Logging streak on Today</b><p>A small habit tracker under the calorie dials: how many of the last 14 days were fully logged, one square per day.</p></header>
+      <div class="phone"><div class="scr">
+        <div class="spread"><span class="h1">Today</span><span class="ib"><svg class="i"><use href="#gear"/></svg></span></div>
+        <div class="card">
+          <span class="label">Calories left</span>
+          <span class="display">1,960</span>
+          <div class="dials">
+            <div><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#2A2C31" stroke-width="8"/><circle cx="50" cy="50" r="40" fill="none" stroke="#FF5A1F" stroke-width="8" stroke-linecap="round" stroke-dasharray="55 251" transform="rotate(-90 50 50)"/><text x="50" y="57" text-anchor="middle">22%</text></svg><span>Protein</span></div>
+            <div><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#2A2C31" stroke-width="8"/><circle cx="50" cy="50" r="40" fill="none" stroke="#F2F2F2" stroke-width="8" stroke-linecap="round" stroke-dasharray="45 251" transform="rotate(-90 50 50)"/><text x="50" y="57" text-anchor="middle">18%</text></svg><span>Carbs</span></div>
+            <div><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#2A2C31" stroke-width="8"/><circle cx="50" cy="50" r="40" fill="none" stroke="#6C7080" stroke-width="8" stroke-linecap="round" stroke-dasharray="50 251" transform="rotate(-90 50 50)"/><text x="50" y="57" text-anchor="middle">20%</text></svg><span>Fat</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="streak">
+            <div class="big">12<small>/14</small></div>
+            <div style="display:grid;gap:2px"><span class="h2">Days fully logged</span><span class="small muted">Lunch and dinner both logged</span></div>
+          </div>
+          <div class="cells"><i></i><i></i><i></i><i></i><i></i><i class="b"></i><i></i><i></i><i></i><i></i><i></i><i class="b"></i><i></i><i class="t"></i></div>
+          <div class="spread small"><span class="muted num">Oct 31</span><span class="muted">Yellow outline = incomplete · tap to clear</span><span class="muted num">Today</span></div>
+        </div>
+      </div></div>
+      <ul class="why"><li>Frames it as a habit rather than a warning</li><li>Could also live on Progress instead of Today</li></ul>
+    </article>
+  </section>
+</main>

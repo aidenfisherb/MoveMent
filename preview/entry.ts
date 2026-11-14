@@ -141,7 +141,17 @@ async function seedRuns() {
   await db.settings.put({ key: "previewRunsSeeded", value: true });
 }
 
+/** Make two past days incomplete so the "incomplete day" label has something to show. */
+async function seedGaps() {
+  if (await db.settings.get("previewGapsSeeded")) return;
+  const d1 = addDays(today, -3), d2 = addDays(today, -10);
+  await db.foodLogs.where("date").equals(d1).filter((l) => l.meal === "lunch" || l.meal === "dinner").delete();
+  await db.foodLogs.where("date").equals(d2).filter((l) => l.meal === "dinner").delete();
+  await db.settings.put({ key: "previewGapsSeeded", value: true });
+}
+
 seed()
   .then(seedRuns)
+  .then(seedGaps)
   .catch((e) => console.error("Preview seed failed", e))
   .finally(() => import("../src/main"));

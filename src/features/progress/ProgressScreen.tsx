@@ -1,13 +1,14 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import { useMemo, useState } from "react";
 import { db } from "../../data/db";
+import { markDayComplete, unmarkDayComplete, useDayStatuses } from "../../data/dayStatus";
 import { useExercises, useSettings } from "../../data/hooks";
 import { addDays, dayKey, parseDay } from "../../lib/dates";
 import { fmt } from "../../lib/format";
 import { sumMacros } from "../../lib/macros";
 import { e1rm } from "../../lib/strength";
 import { distUnitFor, formatPace, formatTime, toUnit } from "../../lib/running";
-import { BarChart, Icon, LineChart } from "../../ui";
+import { BarChart, Icon, LineChart, toast } from "../../ui";
 import { ProfileCard } from "../body/ProfileCard";
 import { WeighInSheet } from "../body/WeighInSheet";
 
@@ -27,6 +28,13 @@ export default function ProgressScreen() {
   const perDay = days.map((d) => sumMacros(logs.filter((l) => l.date === d)));
   const logged = perDay.filter((m) => m.kcal > 0);
   const avg = logged.length ? sumMacros(logged) : null;
+  const statuses = useDayStatuses(calFrom, today);
+  const incompleteDays = days.filter((d) => statuses[d]?.incomplete);
+  const shortDay = (d: string) => parseDay(d).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  const clearFlag = async (d: string) => {
+    await markDayComplete(d);
+    toast(`${shortDay(d)} marked complete`, { action: { label: "Undo", run: () => unmarkDayComplete(d) } });
+  };
 
   const exercises = useExercises();
   const [exId, setExId] = useState<number | "">("");
@@ -88,7 +96,14 @@ export default function ProgressScreen() {
 
       <section className="card">
         <div className="card-head"><h2>Calories, last 14 days</h2></div>
-        <BarChart data={days.map((d, i) => ({ x: parseDay(d).toLocaleDateString(undefined, { weekday: "narrow" }), y: Math.round(perDay[i].kcal) }))} target={settings.targets.kcal} label="Daily calories for the last 14 days with target line" />
+        <BarChart data={days.map((d, i) => ({ x: parseDay(d).toLocaleDateString(undefined, { weekday: "narrow" }), y: Math.round(perDay[i].kcal) }))} target={settings.targets.kcal}
+          hollow={days.map((d) => !!statuses[d]?.incomplete)} onBarTap={(i) => statuses[days[i]]?.incomplete && clearFlag(days[i])}
+          label={`Daily calories for the last 14 days with target line${incompleteDays.length ? `; ${incompleteDays.length} incomplete days shown hollow` : ""}`} />
+        {incompleteDays.length > 0 && (
+          <div className="tip-line">
+            <span><b>{incompleteDays.length} of 14 days</b> incomplete ({incompleteDays.map(shortDay).join(", ")}). Tap a hollow bar to clear it.</span>
+          </div>
+        )}
         {avg && (
           <div className="grid4" style={{ textAlign: "center" }}>
             <div><div className="label">Avg kcal</div><div className="stat">{fmt(avg.kcal / logged.length)}</div></div>

@@ -36,7 +36,11 @@ export function LineChart({ data, unit = "", height = 160, label }: { data: Poin
 }
 
 /** Bars with a dashed target line. Bars over target turn red. */
-export function BarChart({ data, target, height = 150, label }: { data: Point[]; target?: number; height?: number; label: string }) {
+/**
+ * Bars with a dashed target line. Bars over target turn red.
+ * `hollow` draws chosen bars as outlines (e.g. to flag them) and `onBarTap` makes bars tappable.
+ */
+export function BarChart({ data, target, height = 150, label, hollow, onBarTap }: { data: Point[]; target?: number; height?: number; label: string; hollow?: boolean[]; onBarTap?: (i: number) => void }) {
   const W = 340, H = height, L = 40, R = 8, T = 12, B = 22;
   const max = Math.max(target || 0, ...data.map((d) => d.y), 1) * 1.1;
   const ticks = niceTicks(0, max, 3);
@@ -58,8 +62,19 @@ export function BarChart({ data, target, height = 150, label }: { data: Point[];
           const over = target ? d.y > target * 1.05 : false;
           const bx = L + i * bw + bw * 0.18, w = bw * 0.64;
           const r = Math.min(3, w / 2, h);
+          if (hollow?.[i]) {
+            const top = Math.min(y(d.y), y(0) - 6); // keep a visible stub even at zero
+            return (
+              <g key={i} onClick={onBarTap ? () => onBarTap(i) : undefined} style={onBarTap ? { cursor: "pointer" } : undefined}>
+                <rect x={bx} y={T} width={w} height={y(0) - T} fill="transparent" />
+                <rect x={bx + 0.75} y={top + 0.75} width={w - 1.5} height={y(0) - top - 1.5} rx={2} fill="none" stroke="var(--warning)" strokeWidth="1.5" />
+                <text x={bx + w / 2} y={top - 5} textAnchor="middle" style={{ fill: "var(--warning)" }}>!</text>
+                {i % every === 0 && <text x={bx + w / 2} y={H - 6} textAnchor="middle">{d.x}</text>}
+              </g>
+            );
+          }
           return (
-            <g key={i}>
+            <g key={i} onClick={onBarTap ? () => onBarTap(i) : undefined}>
               {d.y > 0 && <path d={`M${bx},${y(0)} V${y(d.y) + r} Q${bx},${y(d.y)} ${bx + r},${y(d.y)} H${bx + w - r} Q${bx + w},${y(d.y)} ${bx + w},${y(d.y) + r} V${y(0)} Z`} fill={over ? "var(--danger)" : "var(--accent)"} />}
               {i % every === 0 && <text x={bx + w / 2} y={H - 6} textAnchor="middle">{d.x}</text>}
             </g>

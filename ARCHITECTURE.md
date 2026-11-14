@@ -155,6 +155,10 @@ erDiagram
     int stravaId
     string polyline
   }
+  DAY_MARKS {
+    string date
+    bool complete
+  }
   PHOTOS {
     int id
     string date
