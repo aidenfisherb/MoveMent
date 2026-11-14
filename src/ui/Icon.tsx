@@ -29,6 +29,7 @@ const paths: Record<string, ReactNode> = {
   sync: <path d="M20 11a8 8 0 0 0-14.6-4.5M4 4v3.5h3.5M4 13a8 8 0 0 0 14.6 4.5M20 20v-3.5h-3.5" />,
   link: <path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" />,
   flag: <path d="M5 21V4h11l-2 4 2 4H5" />,
+  share: <path d="M12 3v12M8 7l4-4 4 4M7 11H5v10h14V11h-2" />,
   trophy: <path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 20h8M10 17h4" />
 };
 
