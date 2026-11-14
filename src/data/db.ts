@@ -89,6 +89,9 @@ export interface Activity {
   polyline?: string;
 }
 
+/** A day you've marked as complete even though lunch or dinner is missing. */
+export interface DayMark { date: string; complete: true; markedAt: number }
+
 /** A progress photo. Stored resized (about 1600px) plus a small thumbnail for the grid. */
 export interface Photo {
   id?: number;
@@ -111,6 +114,7 @@ class MoveMentDB extends Dexie {
   settings!: Table<Setting, string>;
   photos!: Table<Photo, number>;
   activities!: Table<Activity, number>;
+  dayMarks!: Table<DayMark, string>;
 
   constructor() {
     super("movement");
@@ -128,6 +132,8 @@ class MoveMentDB extends Dexie {
     this.version(2).stores({ photos: "++id, date" });
     // v3: runs and other cardio (manual or from Strava).
     this.version(3).stores({ activities: "++id, date, startedAt, &stravaId, sport" });
+    // v4: days manually marked complete (clears the "incomplete" label).
+    this.version(4).stores({ dayMarks: "date" });
     this.on("populate", (tx) => {
       const starter: Exercise[] = [
         ["Bench press", "weight"], ["Incline dumbbell press", "weight"], ["Overhead press", "weight"],

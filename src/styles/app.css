@@ -180,3 +180,27 @@ textarea.input { height: auto; min-height: 140px; padding: 10px 12px; font: 13px
 .effort button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 .row .name svg { vertical-align: -2px; color: var(--muted); }
 a.btn { text-decoration: none; }
+
+/* Incomplete-day label (informational only) */
+.day-title { display: grid; justify-items: center; gap: 4px; min-width: 0; }
+.day-title h1 { text-align: center; }
+.flag-chip { display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 10px 0 8px; border-radius: var(--r-pill); border: 1px solid rgba(255, 194, 51, .5); background: transparent; color: var(--warning); font: 600 11px var(--font-text); cursor: pointer; white-space: nowrap; }
+.flag-chip svg { width: 13px; height: 13px; }
+.flag-chip.cleared { border-color: var(--line); color: var(--muted); }
+.tip-line { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 8px 10px 8px 12px; border: 1px solid var(--line); border-radius: var(--r-card); background: var(--surface); font-size: 12px; color: var(--muted); }
+.tip-line b { color: var(--fg); font-weight: 600; }
+.tip-line .btn { flex: none; }
+
+/* Week strip on Food */
+.week-strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.wd { display: grid; justify-items: center; gap: 4px; background: none; border: 0; padding: 2px 0; color: var(--muted); cursor: pointer; font: inherit; }
+.wd[disabled] { opacity: .35; cursor: default; }
+.wd .wl { font: 600 10.5px var(--font-text); }
+.wd .wn { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font: 600 12px var(--font-num); color: var(--fg); border: 1px solid var(--line); }
+.wd i { width: 6px; height: 6px; border-radius: 50%; }
+.wd.ok .wn { background: var(--surface-2); }
+.wd.ok i { background: var(--success); }
+.wd.bad .wn { border: 2px solid var(--warning); color: var(--warning); }
+.wd.bad i { background: var(--warning); }
+.wd.today .wn { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.wd.sel .wn { outline: 2px solid var(--fg); outline-offset: 2px; }

@@ -6,7 +6,9 @@ import { addDays, dayKey, prettyDay } from "../../lib/dates";
 import { cap, fmt } from "../../lib/format";
 import { sumMacros } from "../../lib/macros";
 import { Icon, toast } from "../../ui";
+import { markDayComplete, missingText, unmarkDayComplete, useDayStatuses } from "../../data/dayStatus";
 import { AddFoodSheet } from "./add/AddFoodSheet";
+import { WeekStrip, weekStart } from "./WeekStrip";
 import { EditLogSheet } from "./EditLogSheet";
 import { copyDay, undoCopy } from "./foodActions";
 
@@ -18,6 +20,11 @@ export default function FoodScreen() {
   const [adding, setAdding] = useState<Meal | null>(null);
   const [editing, setEditing] = useState<FoodLog | null>(null);
   const isToday = date === dayKey();
+  const wkStart = weekStart(date);
+  const statuses = useDayStatuses(wkStart, addDays(wkStart, 6));
+  const status = statuses[date];
+  const [tipOpen, setTipOpen] = useState(false);
+  const pick = (d: string) => { setDate(d); setTipOpen(false); };
 
   const copyYesterday = async () => {
     const ids = await copyDay(addDays(date, -1), date);
@@ -28,10 +35,33 @@ export default function FoodScreen() {
   return (
     <main className="screen">
       <div className="screen-head">
-        <button className="btn icon-btn" type="button" aria-label="Previous day" onClick={() => setDate(addDays(date, -1))}><Icon name="left" /></button>
-        <h1 style={{ textAlign: "center" }}>{prettyDay(date)}</h1>
-        <button className="btn icon-btn" type="button" aria-label="Next day" disabled={isToday} onClick={() => setDate(addDays(date, 1))}><Icon name="right" /></button>
+        <button className="btn icon-btn" type="button" aria-label="Previous day" onClick={() => pick(addDays(date, -1))}><Icon name="left" /></button>
+        <div className="day-title">
+          <h1>{prettyDay(date)}</h1>
+          {status?.incomplete && (
+            <button type="button" className="flag-chip" aria-expanded={tipOpen} onClick={() => setTipOpen(!tipOpen)}><Icon name="flag" />Incomplete</button>
+          )}
+          {status?.markedComplete && (
+            <button type="button" className="flag-chip cleared" aria-expanded={tipOpen} onClick={() => setTipOpen(!tipOpen)}><Icon name="check" />Marked complete</button>
+          )}
+        </div>
+        <button className="btn icon-btn" type="button" aria-label="Next day" disabled={isToday} onClick={() => pick(addDays(date, 1))}><Icon name="right" /></button>
       </div>
+
+      {tipOpen && status?.incomplete && (
+        <div className="tip-line">
+          <span>{cap(missingText(status.missing))}.</span>
+          <button className="btn btn-ghost btn-sm" style={{ color: "var(--accent)" }} type="button" onClick={async () => { await markDayComplete(date); setTipOpen(false); toast("Marked complete", { action: { label: "Undo", run: () => unmarkDayComplete(date) } }); }}>Mark complete</button>
+        </div>
+      )}
+      {tipOpen && status?.markedComplete && (
+        <div className="tip-line">
+          <span>You marked this day complete ({missingText(status.missing)}).</span>
+          <button className="btn btn-ghost btn-sm" type="button" onClick={async () => { await unmarkDayComplete(date); setTipOpen(false); }}>Undo</button>
+        </div>
+      )}
+
+      <WeekStrip selected={date} statuses={statuses} onPick={pick} />
 
       <section className="card">
         <div className="grid4" style={{ textAlign: "center" }}>

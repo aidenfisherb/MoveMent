@@ -3,7 +3,7 @@ import { PRIVATE_SETTING_KEYS, saveSetting } from "../../data/settings";
 import { dayKey } from "../../lib/dates";
 import { blobToDataUrl, dataUrlToBlob } from "../../lib/image";
 
-const TABLES = ["foods", "foodLogs", "exercises", "routines", "workouts", "sets", "weights", "activities", "settings"] as const;
+const TABLES = ["foods", "foodLogs", "exercises", "routines", "workouts", "sets", "weights", "activities", "dayMarks", "settings"] as const;
 
 export type Backup = { app: "movement"; version: number; exportedAt: string } & Record<string, unknown>;
 
@@ -59,7 +59,7 @@ export async function restoreBackup(data: Backup) {
     const keep = await db.settings.where("key").anyOf(PRIVATE_SETTING_KEYS).toArray();
     for (const name of TABLES) {
       const rows = data[name];
-      if (!Array.isArray(rows) && name === "activities") continue; // older backups have no runs; keep the ones here
+      if (!Array.isArray(rows) && (name === "activities" || name === "dayMarks")) continue; // tables older backups don't have: keep what's here
       await db.table(name).clear();
       if (Array.isArray(rows) && rows.length) await db.table(name).bulkAdd(rows);
     }
